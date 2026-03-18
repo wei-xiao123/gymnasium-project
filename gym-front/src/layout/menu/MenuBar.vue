@@ -1,0 +1,171 @@
+<template>
+  <menu-logo :is-collapsed="isCollapse"></menu-logo>
+  <el-menu
+    :collapse="isCollapse"
+    :default-active="activeIndex"
+    class="el-menu-vertical-demo"
+    unique-opened
+    background-color="#304156"
+    router
+  >
+    <menu-item :menu-list="menuList"></menu-item>
+  </el-menu>
+</template>
+
+<script setup lang="ts">
+import { computed, reactive } from 'vue'
+import { useRoute } from 'vue-router'
+import MenuItem from '@/layout/menu/MenuItem.vue'
+import MenuLogo from '@/layout/menu/MenuLogo.vue'
+import { collapseStore } from '@/store/collapse/index'
+
+const colstore = collapseStore()
+const route = useRoute()
+
+// 获取折叠状态
+const isCollapse = computed(() => {
+  return colstore.getCollapse
+})
+
+// 获取激活的菜单
+const activeIndex = computed(() => {
+  const { path } = route
+  return path
+})
+
+// 树形的菜单数据
+// reactive: 定义响应式的数据（复杂类型，对象）
+let menuList = reactive([
+  {
+    path: '/system',
+    component: 'Layout',
+    name: 'system',
+    meta: {
+      title: '系统管理',
+      icon: 'Setting',
+      roles: ['sys:manage'],
+    },
+    children: [
+      {
+        path: '/userList',
+        component: '/system/User/UserList',
+        name: 'userList',
+        meta: {
+          title: '员工管理',
+          icon: 'UserFilled',
+          roles: ['sys:user'],
+        },
+      },
+      {
+        path: '/roleList',
+        component: '/system/Role/RoleList',
+        name: 'roleList',
+        meta: {
+          title: '角色管理',
+          icon: 'Wallet',
+          roles: ['sys:role'],
+        },
+      },
+      {
+        path: '/menuList',
+        component: '/system/Menu/MenuList',
+        name: 'menuList',
+        meta: {
+          title: '菜单管理',
+          icon: 'Menu',
+          roles: ['sys:menu'],
+        },
+      },
+    ],
+  },
+  {
+    path: '/memberRoot',
+    component: 'Layout',
+    name: 'memberRoot',
+    meta: {
+      title: '会员管理',
+      icon: 'Setting',
+      roles: ['sys:memberRoot'],
+    },
+    children: [
+      {
+        path: '/cardType',
+        component: '/member/CardType',
+        name: 'cardType',
+        meta: {
+          title: '会员卡类型',
+          icon: 'UserFilled',
+          roles: ['sys:cardType'],
+        },
+      },
+      {
+        path: '/memberList',
+        component: '/member/MemberList',
+        name: 'memberList',
+        meta: {
+          title: '会员管理',
+          icon: 'Wallet',
+          roles: ['sys:memberList'],
+        },
+      },
+      {
+        path: '/myFee',
+        component: '/system/MyFee',
+        name: 'myFee',
+        meta: {
+          title: '我的充值',
+          icon: 'Menu',
+          roles: ['sys:myFee'],
+        },
+      },
+    ],
+  },
+])
+</script>
+
+<style scoped lang="scss">
+.el-menu-vertical-demo:not(.el-menu--collapse) {
+  width: 100%;
+  min-height: 400px;
+}
+
+.el-menu-vertical-demo.el-menu--collapse {
+  width: 100%;
+}
+
+.el-menu {
+  border-right: none;
+}
+
+:deep(.el-sub-menu .el-sub-menu__title) {
+  color: #f4f4f5 !important;
+}
+
+:deep(.el-menu .el-menu-item) {
+  color: #bfcbd9;
+}
+
+/* 菜单激活项文字的颜色 */
+:deep(.el-menu-item.is-active) {
+  color: #409eff !important;
+}
+
+/* 当前打开菜单的所有子菜单颜色 */
+:deep(.is-opened .el-menu-item) {
+  background-color: #304156 !important;
+}
+
+/* 鼠标移动菜单的颜色 */
+:deep(.el-menu-item:hover) {
+  background-color: #001528 !important;
+}
+
+/* 移除子菜单的默认缩进，使左边对齐 */
+:deep(.el-menu--inline) {
+  background-color: #304156 !important;
+}
+
+:deep(.el-menu--inline .el-menu-item) {
+  padding-left: 20px !important;
+}
+</style>
