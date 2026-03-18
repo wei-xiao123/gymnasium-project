@@ -4,11 +4,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xq.utils.ResultUtils;
 import com.xq.utils.ResultVo;
 import com.xq.web.sys_role.entity.RoleParam;
+import com.xq.web.sys_role.entity.SelectType;
 import com.xq.web.sys_role.entity.SysRole;
 import com.xq.web.sys_role.service.SysRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/role")
@@ -49,5 +53,20 @@ public class SysRoleController {
     public ResultVo getList(RoleParam param){
         IPage<SysRole> list = sysRoleService.list(param);
         return ResultUtils.success("查询成功",list);
+    }
+    //查询页面需要显示的角色信息
+    @GetMapping("/getSelect")
+    public ResultVo getListSelect(){
+        List<SysRole> list = sysRoleService.list();
+        List<SelectType> selectTypeList = new ArrayList<>();
+        if(list.size() > 0){
+            list.stream().forEach(item ->{
+                SelectType type = new SelectType();
+                type.setValue(item.getRoleId());
+                type.setLabel(item.getRoleName());
+                selectTypeList.add(type);
+            });
+        }
+        return ResultUtils.success("查询成功",selectTypeList);
     }
 }
