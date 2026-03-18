@@ -1,0 +1,15 @@
+package com.xq.utils;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+//封装返回值数据
+@Data
+@AllArgsConstructor
+public class ResultVo <T> {
+
+    private String msg;
+
+    private int code;
+
+    private T data;
+}

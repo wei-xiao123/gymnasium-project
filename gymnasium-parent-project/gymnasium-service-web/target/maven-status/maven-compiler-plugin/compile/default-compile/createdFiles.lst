@@ -1,0 +1,10 @@
+com\xq\web\sys_role\mapper\SysRoleMapper.class
+com\xq\web\sys_role\entity\SysRole.class
+com\xq\web\sys_role\controller\SysRoleController.class
+com\xq\web\sys_role\entity\RoleParam.class
+com\xq\config\SwaggerConfig.class
+com\xq\GYMServiceWebApplication.class
+com\xq\web\sys_role\service\Impl\SysRoleServiceImpl.class
+com\xq\config\WebMvcConfig.class
+com\xq\config\MybatisPlusConfig.class
+com\xq\web\sys_role\service\SysRoleService.class
