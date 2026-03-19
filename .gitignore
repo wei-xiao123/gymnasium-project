@@ -1,0 +1,10 @@
+# 忽略 IDEA 配置
+.idea/
+*.iml
+
+# 忽略前端生成的依赖和构建产物
+node_modules/
+dist/
+
+# 忽略后端编译产物
+target/
