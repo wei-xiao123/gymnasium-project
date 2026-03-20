@@ -1,11 +1,10 @@
 package com.xq.web.member.entity;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
+import java.math.BigDecimal;
 @Data
 @TableName("member")
 public class Member {
@@ -27,5 +26,8 @@ public class Member {
     private String username;
     private String password;
     private String status;
-
+    private String cardType;
+    private Integer cardDay;
+    private BigDecimal money;
+    private BigDecimal price;
 }
