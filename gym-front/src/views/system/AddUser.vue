@@ -114,9 +114,13 @@ import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
 import { addApi, editApi } from "@/api/user/index";
 import { EditType, Title } from "@/type/BaseEnum";
+import useInstance from "@/hooks/useInstance";
 
 // 表单 ref 属性
 const addFormRef = ref<FormInstance>();
+
+// 全局实例
+const { global } = useInstance();
 
 // 角色
 const { roleData, listRole, roleId, getRole } = useSelectRole();
@@ -214,30 +218,36 @@ const emits = defineEmits(["refresh"]);
 // 显示弹框
 const show = async (type: string, row?: AddUserModel) => {
   dialog.height = 270;
-  addModel.type = type;
-
-  // 获取角色数据
-  await listRole();
 
   // 设置弹框标题
   dialog.title = type === EditType.ADD ? Title.ADD : Title.EDIT;
 
-  // 编辑时回显数据
-  if (type === EditType.EDIT && row) {
-    // 复制数据
-    Object.keys(row).forEach(key => {
-      (addModel as any)[key] = (row as any)[key];
-    });
-    // 获取用户的角色
-    await getRole(row.userId);
-    addModel.roleId = roleId.value;
-  } else if (type === EditType.ADD) {
+  if (type === EditType.ADD) {
     // 新增时清空表单
-    roleId.value = "";
-    addModel.roleId = "";
-    addFormRef.value?.resetFields();
+    Object.keys(addModel).forEach((key) => {
+      (addModel as any)[key] = "";
+    });
+    // 获取角色数据列表
+    await listRole();
+    addFormRef.value?.clearValidate();
+  } else if (type === EditType.EDIT && row) {
+    // 编辑时回显数据
+    // 1. 先获取角色数据列表
+    await listRole();
+    // 2. 清空表单
+    Object.keys(addModel).forEach((key) => {
+      (addModel as any)[key] = "";
+    });
+    // 3. 复制员工数据到表单
+    global.$objCopy(row, addModel);
+    // 4. 根据员工 ID 获取该员工的角色 ID
+    await getRole(row.userId);
+    // 5. 设置角色字段
+    addModel.roleId = roleId.value;
+    addFormRef.value?.clearValidate();
   }
 
+  addModel.type = type;
   onShow();
 };
 
