@@ -60,45 +60,33 @@ public class MemberController {
         return ResultUtils.success("删除成功");
     }
 
-    //分页查询
     @GetMapping("/list")
     public ResultVo list(PageParam pageParam){
-        if(pageParam.getUserType().equals("1")){
-            //构造分页对象
-            IPage<Member> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
-            //构造查询条件
-            QueryWrapper<Member> query = new QueryWrapper<>();
-            if(StringUtils.isNotEmpty(pageParam.getName())){
-                query.lambda().like(Member::getName,pageParam.getName());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getPhone())){
-                query.lambda().like(Member::getPhone,pageParam.getPhone());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getUsername())){
-                query.lambda().like(Member::getUsername,pageParam.getUsername());
-            }
-            query.lambda().eq(Member::getMemberId,pageParam.getMemberId());
-            query.lambda().orderByDesc(Member::getJoinTime);
-            IPage<Member> list = memberService.page(page, query);
-            return ResultUtils.success("查询成功",list);
-        }else{
-            //构造分页对象
-            IPage<Member> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
-            //构造查询条件
-            QueryWrapper<Member> query = new QueryWrapper<>();
-            if(StringUtils.isNotEmpty(pageParam.getName())){
-                query.lambda().like(Member::getName,pageParam.getName());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getPhone())){
-                query.lambda().like(Member::getPhone,pageParam.getPhone());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getUsername())){
-                query.lambda().like(Member::getUsername,pageParam.getUsername());
-            }
-            query.lambda().orderByDesc(Member::getJoinTime);
-            IPage<Member> list = memberService.page(page, query);
-            return ResultUtils.success("查询成功",list);
+        // 统一构造分页对象
+        IPage<Member> page = new Page<>(pageParam.getCurrentPage(), pageParam.getPageSize());
+
+        // 统一构造查询条件
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        if(StringUtils.isNotEmpty(pageParam.getName())){
+            query.lambda().like(Member::getName, pageParam.getName());
         }
+        if(StringUtils.isNotEmpty(pageParam.getPhone())){
+            query.lambda().like(Member::getPhone, pageParam.getPhone());
+        }
+        if(StringUtils.isNotEmpty(pageParam.getUsername())){
+            query.lambda().like(Member::getUsername, pageParam.getUsername());
+        }
+
+        // 3.使用常量在前的写法防止 NPE，并处理特定逻辑
+        if("1".equals(pageParam.getUserType())){
+            query.lambda().eq(Member::getMemberId, pageParam.getMemberId());
+        }
+
+        query.lambda().orderByDesc(Member::getJoinTime);
+
+        // 4. 执行查询
+        IPage<Member> list = memberService.page(page, query);
+        return ResultUtils.success("查询成功", list);
     }
 
     @Autowired

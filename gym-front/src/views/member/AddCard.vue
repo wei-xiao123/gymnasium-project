@@ -16,7 +16,7 @@
         size="default"
       >
         <el-row>
-          <el-col :span="24" :offset="0">
+          <el-col :span="24">
             <el-form-item prop="cardType" label="类型">
               <el-radio-group v-model="addModel.cardType">
                 <el-radio :label="'1'">天卡</el-radio>
@@ -28,24 +28,24 @@
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" :offset="0">
+          <el-col :span="12">
             <el-form-item prop="title" label="标题">
-              <el-input v-model="addModel.title"></el-input>
+              <el-input v-model="addModel.title" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" :offset="0">
+          <el-col :span="12">
             <el-form-item prop="cardDay" label="天数">
-              <el-input v-model="addModel.cardDay"></el-input>
+              <el-input v-model="addModel.cardDay" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12" :offset="0">
+          <el-col :span="12">
             <el-form-item prop="price" label="价格">
-              <el-input v-model="addModel.price"></el-input>
+              <el-input v-model="addModel.price" />
             </el-form-item>
           </el-col>
-          <el-col :span="12" :offset="0">
+          <el-col :span="12">
             <el-form-item prop="status" label="状态">
               <el-radio-group v-model="addModel.status">
                 <el-radio :label="'0'">停用</el-radio>
@@ -84,8 +84,13 @@ const show = (type: string, row?: CardType) => {
     ? (dialog.title = Title.ADD)
     : (dialog.title = Title.EDIT);
 
-  if (type == EditType.EDIT) {
-    // 把要编辑的数据复制到表单对象
+  if (type == EditType.ADD) {
+    // 新增模式：清空所有字段
+    Object.keys(addModel).forEach(key => {
+      (addModel as any)[key] = "";
+    });
+  } else if (type == EditType.EDIT) {
+    // 编辑模式：把要编辑的数据复制到表单对象
     global.$objCopy(row, addModel);
   }
 
@@ -105,7 +110,7 @@ const addModel = reactive<CardType>({
   cardType: "",
   cardId: "",
   price: "",
-  cardDay: 0,
+  cardDay: null as any,
   status: "",
 });
 
@@ -149,18 +154,17 @@ const rules = reactive({
 });
 
 // 注册事件
-const emits = defineEmits(["refresh"]);
+const emits = defineEmits<{
+  refresh: [];
+}>();
 
 // 表单提交
 const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null;
-      if (addModel.type == EditType.ADD) {
-        res = await addApi(addModel);
-      } else {
-        res = await editApi(addModel);
-      }
+      const res = addModel.type == EditType.ADD
+        ? await addApi(addModel)
+        : await editApi(addModel);
       if (res && res.code == 200) {
         ElMessage.success(res.msg);
         emits("refresh");
