@@ -13,25 +13,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
-import { useRoute } from 'vue-router'
-import MenuItem from '@/layout/menu/MenuItem.vue'
-import MenuLogo from '@/layout/menu/MenuLogo.vue'
-import { collapseStore } from '@/store/collapse/index'
+import { computed, reactive } from "vue";
+import { useRoute } from "vue-router";
+import MenuItem from "@/layout/menu/MenuItem.vue";
+import MenuLogo from "@/layout/menu/MenuLogo.vue";
+import { collapseStore } from "@/store/collapse/index";
 
-const colstore = collapseStore()
-const route = useRoute()
+const colstore = collapseStore();
+const route = useRoute();
 
 // 获取折叠状态
 const isCollapse = computed(() => {
-  return colstore.getCollapse
-})
+  return colstore.getCollapse;
+});
 
 // 获取激活的菜单
 const activeIndex = computed(() => {
-  const { path } = route
-  return path
-})
+  const { path } = route;
+  return path;
+});
 
 // 树形的菜单数据
 // reactive: 定义响应式的数据（复杂类型，对象）
@@ -121,38 +121,61 @@ let menuList = reactive([
     ],
   },
   {
-path: "/courseRoot",
-component: "Layout",
-name: "courseRoot",
-meta: {
-title: "课程管理",
-icon: "ScaleToOriginal",
-roles: ["sys:courseRoot"],
-},
-children: [
-{
-path: "/courseList",
-component: "/course/CourseList",
-name: "courseList",
-meta: {
-title: "课程列表",
-icon: "UserFilled",
-roles: ["sys:courseList"],
-},
-},
-{
-path: "/mycourse",
-component: "/mycourse/mycourse",
-name: "mycourse",
-meta: {
-title: "我的课程",
-icon: "Wallet",
-roles: ["sys:mycourse"],
-},
-}
-],
-},
-])
+    path: "/courseRoot",
+    component: "Layout",
+    name: "courseRoot",
+    meta: {
+      title: "课程管理",
+      icon: "ScaleToOriginal",
+      roles: ["sys:courseRoot"]
+    },
+    children: [
+      {
+        path: "/courseList",
+        component: "/course/CourseList",
+        name: "courseList",
+        meta: {
+          title: "课程列表",
+          icon: "UserFilled",
+          roles: ["sys:courseList"]
+        }
+      },
+      {
+        path: "/mycourse",
+        component: "/mycourse/mycourse",
+        name: "mycourse",
+        meta: {
+          title: "我的课程",
+          icon: "Wallet",
+          roles: ["sys:mycourse"]
+        }
+      }
+    ]
+  },
+  {
+    path: "/materialRoot",
+    component: "Layout",
+    name: "materialRoot",
+    meta: {
+      title: "器材管理",
+      icon: "KnifeFork",
+      roles: ["sys:materialRoot"]
+    },
+    children: [
+      {
+        path: "/materialList",
+        component: "/material/MaterialList",
+        name: "materialList",
+        meta: {
+          title: "器材列表",
+          icon: "UserFilled",
+          roles: ["sys:materialList"]
+        }
+      }
+    ]
+  }
+]);
+
 </script>
 
 <style scoped lang="scss">

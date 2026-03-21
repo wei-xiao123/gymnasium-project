@@ -1,0 +1,87 @@
+import type { ListParam } from "@/api/material/MaterialModel";
+import { getListApi } from "@/api/material";
+import { nextTick, onMounted, reactive, ref } from "vue";
+
+export default function useTable(): {
+  listParam: ListParam;
+  searchBtn: () => void;
+  resetBtn: () => void;
+  tableData: { list: any[] };
+  sizeChange: (size: number) => void;
+  currentChange: (page: number) => void;
+  tableHeight: any;
+  reFresh: () => void;
+} {
+  // 列表查询参数
+  const listParam = reactive<ListParam>({
+    name: "",
+    currentPage: 1,
+    pageSize: 10,
+    total: 10
+  });
+
+  // 表格数据
+  const tableData = reactive<{ list: any[] }>({
+    list: []
+  });
+
+  // 表格高度
+  const tableHeight = ref<number>(400);
+
+  // 获取表格数据
+  const getList = async () => {
+    const res = await getListApi(listParam);
+    if (res && res.code == 200) {
+      tableData.list = res.data.records;
+      listParam.total = res.data.total;
+    }
+  };
+
+  // 搜索
+  const searchBtn = () => {
+    listParam.currentPage = 1;
+    getList();
+  };
+
+  // 重置
+  const resetBtn = () => {
+    listParam.name = "";
+    listParam.currentPage = 1;
+    getList();
+  };
+
+  // 页容量改变时触发
+  const sizeChange = (size: number) => {
+    listParam.pageSize = size;
+    getList();
+  };
+
+  // 页数改变时触发
+  const currentChange = (page: number) => {
+    listParam.currentPage = page;
+    getList();
+  };
+
+  // 刷新列表
+  const reFresh = () => {
+    getList();
+  };
+
+  onMounted(() => {
+    nextTick(() => {
+      tableHeight.value = window.innerHeight - 230;
+    });
+    getList();
+  });
+
+  return {
+    listParam,
+    searchBtn,
+    resetBtn,
+    tableData,
+    sizeChange,
+    currentChange,
+    tableHeight,
+    reFresh
+  };
+}

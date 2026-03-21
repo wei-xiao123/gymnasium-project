@@ -139,7 +139,18 @@ const { global } = useInstance();
 const addFormRef = ref<FormInstance>();
 
 // 弹框属性
-const { dialog, onClose, onShow } = useDialog();
+const { dialog, onClose: useDialogClose, onShow } = useDialog();
+
+// 自定义关闭函数 - 支持关闭和刷新
+const onClose = () => {
+  useDialogClose();
+  // 编辑模式关闭时，100ms后刷新页面
+  if (addModel.type == EditType.EDIT) {
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+  }
+};
 
 // 教练选择
 const { teacherData, listTeacher } = useSelectTeacher();
@@ -169,11 +180,6 @@ const {
 
 // 显示弹框
 const show = async (type: string, row?: CourseType) => {
-  // 清空图片数据
-  fileList.value = [];
-  // 获取教练数据列表
-  await listTeacher();
-  
   // 弹框属性
   type == EditType.ADD
     ? (dialog.title = Title.ADD)
@@ -181,29 +187,43 @@ const show = async (type: string, row?: CourseType) => {
   dialog.width = 900;
   dialog.height = 500;
 
-  // 清空图片和文本编辑器
+  // 获取教练数据列表
+  await listTeacher();
+  
+  // 清空上传组件
   const upload = uploadRef.value;
   if (upload) {
     upload.clearFiles();
   }
-  addModel.image = "";
   
   if (type == EditType.ADD) {
+    // 新增模式：清空所有数据
+    fileList.value = [];
     const editor = editorRef.value;
     if (editor) {
       editor.clear();
     }
-    addModel.courseDetails = "";
-  }
-
-  // 编辑数据回显
-  if (type == EditType.EDIT) {
+    // 确保在 nextTick 中清空所有字段
     nextTick(() => {
-      // 设置编辑的数据到表单绑定的数据对象
-      global.$objCopy(row, addModel);
-      // 文本编辑器数据回显
-      valueHtml.value = addModel.courseDetails;
-      // 封面图回显
+      addModel.courseId = "";
+      addModel.courseName = "";
+      addModel.courseDetails = "";
+      addModel.courseHour = "" as any;
+      addModel.coursePrice = "" as any;
+      addModel.teacherName = "";
+      addModel.image = "";
+      valueHtml.value = "";
+      addFormRef.value?.resetFields();
+    });
+  } else if (type == EditType.EDIT) {
+    // 编辑模式：回显数据
+    // 先复制数据
+    global.$objCopy(row, addModel);
+    // 设置文本编辑器数据
+    valueHtml.value = addModel.courseDetails;
+    // 清空并回显封面图
+    fileList.value = [];
+    nextTick(() => {
       if (row?.image) {
         const obj: any = {
           name: "",
@@ -215,16 +235,13 @@ const show = async (type: string, row?: CourseType) => {
         fileList.value.push(obj);
       }
     });
-  }
-  
-  if (row && row.courseDetails) {
-    // 文本编辑器的回显
-    valueHtml.value = row.courseDetails;
+    // 清除表单验证错误
+    nextTick(() => {
+      addFormRef.value?.clearValidate();
+    });
   }
   
   onShow();
-  // 表单清空
-  addFormRef.value?.resetFields();
   addModel.type = type;
 };
 
@@ -240,13 +257,15 @@ const addModel = reactive<CourseType>({
   courseName: "",
   image: "",
   teacherName: "",
-  courseHour: 0,
+  courseHour: "" as any,
   courseDetails: "",
-  coursePrice: 0
+  coursePrice: "" as any
 });
 
 const validateCourseHour = (_rule: any, value: any, callback: any) => {
-  if (value === 0 || value < 0) {
+  if (value === "" || value === null || value === undefined) {
+    callback(new Error("请填写课程课时"));
+  } else if (Number(value) <= 0) {
     callback(new Error("请填写课程课时"));
   } else {
     callback();
@@ -254,7 +273,9 @@ const validateCourseHour = (_rule: any, value: any, callback: any) => {
 };
 
 const validateCoursePrice = (_rule: any, value: any, callback: any) => {
-  if (value === 0 || value < 0) {
+  if (value === "" || value === null || value === undefined) {
+    callback(new Error("请填写课程价格"));
+  } else if (Number(value) <= 0) {
     callback(new Error("请填写课程价格"));
   } else {
     callback();
@@ -318,6 +339,9 @@ const commit = () => {
   addModel.image = imgurl.value;
   // 课程详情
   addModel.courseDetails = valueHtml.value;
+  // 转换课时和价格为数字
+  addModel.courseHour = Number(addModel.courseHour);
+  addModel.coursePrice = Number(addModel.coursePrice);
   
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
