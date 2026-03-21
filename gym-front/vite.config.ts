@@ -15,5 +15,10 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src')
     }
+  },
+  define:{
+    'process.env': {
+      'BASE_API':"http://localhost:8089"
+    }
   }
 })

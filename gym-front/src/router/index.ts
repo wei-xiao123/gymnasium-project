@@ -1,113 +1,145 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
-import Layout from '@/layout/Index.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import type { RouteRecordRaw } from "vue-router";
+import Layout from "@/layout/Index.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect: '/dashboard',
+    redirect: "/dashboard",
     children: [
       {
-        path: '/dashboard',
-        component: () => import('@/layout/dashboard/Index.vue'),
-        name: 'dashboard',
+        path: "/dashboard",
+        component: () => import("@/layout/dashboard/Index.vue"),
+        name: "dashboard",
         meta: {
-          title: '首页',
-          icon: '#icondashboard',
-        },
-      },
-    ],
+          title: "首页",
+          icon: "#icondashboard"
+        }
+      }
+    ]
   },
   {
-    path: '/system',
+    path: "/system",
     component: Layout,
-    name: 'system',
+    name: "system",
     meta: {
-      title: '系统管理',
-      icon: 'el-icon-menu',
-      roles: ['sys:manage'],
+      title: "系统管理",
+      icon: "el-icon-menu",
+      roles: ["sys:manage"]
     },
     children: [
       {
-        path: '/userList',
-        component: () => import('@/views/system/UserList.vue'),
-        name: 'userList',
+        path: "/userList",
+        component: () => import("@/views/system/UserList.vue"),
+        name: "userList",
         meta: {
-          title: '员工管理',
-          icon: 'el-icon-s-custom',
-          roles: ['sys:user'],
-        },
+          title: "员工管理",
+          icon: "el-icon-s-custom",
+          roles: ["sys:user"]
+        }
       },
       {
-        path: '/roleList',
-        component: () => import('@/views/system/RoleList.vue'),
-        name: 'roleList',
+        path: "/roleList",
+        component: () => import("@/views/system/RoleList.vue"),
+        name: "roleList",
         meta: {
-          title: '角色管理',
-          icon: 'el-icon-s-tools',
-          roles: ['sys:role'],
-        },
+          title: "角色管理",
+          icon: "el-icon-s-tools",
+          roles: ["sys:role"]
+        }
       },
       {
-        path: '/menuList',
-        component: () => import('@/views/system/MenuList.vue'),
-        name: 'menuList',
+        path: "/menuList",
+        component: () => import("@/views/system/MenuList.vue"),
+        name: "menuList",
         meta: {
-          title: '权限管理',
-          icon: 'el-icon-document',
-          roles: ['sys:menu'],
-        },
-      },
-    ],
+          title: "权限管理",
+          icon: "el-icon-document",
+          roles: ["sys:menu"]
+        }
+      }
+    ]
   },
   {
-    path: '/memberRoot',
+    path: "/memberRoot",
     component: Layout,
-    name: 'memberRoot',
+    name: "memberRoot",
     meta: {
-      title: '会员管理',
-      icon: 'Setting',
-      roles: ['sys:memberRoot'],
+      title: "会员管理",
+      icon: "Setting",
+      roles: ["sys:memberRoot"]
     },
     children: [
       {
-        path: '/cardType',
-        component: () => import('@/views/member/CardType.vue'),
-        name: 'cardType',
+        path: "/cardType",
+        component: () => import("@/views/member/CardType.vue"),
+        name: "cardType",
         meta: {
-          title: '会员卡类型',
-          icon: 'UserFilled',
-          roles: ['sys:cardType'],
-        },
+          title: "会员卡类型",
+          icon: "UserFilled",
+          roles: ["sys:cardType"]
+        }
       },
       {
-        path: '/memberList',
-        component: () => import('@/views/member/MemberList.vue'),
-        name: 'memberList',
+        path: "/memberList",
+        component: () => import("@/views/member/MemberList.vue"),
+        name: "memberList",
         meta: {
-          title: '会员管理',
-          icon: 'Wallet',
-          roles: ['sys:memberList'],
-        },
+          title: "会员管理",
+          icon: "Wallet",
+          roles: ["sys:memberList"]
+        }
       },
       {
-        path: '/myFee',
-        component: () => import('@/views/member/MyFee.vue'),
-        name: 'myFee',
+        path: "/myFee",
+        component: () => import("@/views/member/MyFee.vue"),
+        name: "myFee",
         meta: {
-          title: '我的充值',
-          icon: 'Menu',
-          roles: ['sys:myFee'],
-        },
-      },
-    ],
+          title: "我的充值",
+          icon: "Menu",
+          roles: ["sys:myFee"]
+        }
+      }
+    ]
   },
-]
+  {
+    path: "/courseRoot",
+    component: Layout,
+    name: "courseRoot",
+    meta: {
+      title: "课程管理",
+      icon: "Document",
+      roles: ["sys:courseRoot"]
+    },
+    children: [
+      {
+        path: "/courseList",
+        component: () => import("@/views/course/CourseList.vue"),
+        name: "courseList",
+        meta: {
+          title: "课程列表",
+          icon: "UserFilled",
+          roles: ["sys:courseList"]
+        }
+      },
+      {
+        path: "/mycourse",
+        component: () => import("@/views/mycourse/MyCourse.vue"),
+        name: "mycourse",
+        meta: {
+          title: "我的课程",
+          icon: "Wallet",
+          roles: ["sys:mycourse"]
+        }
+      }
+    ]
+  }
+];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
-})
+  routes
+});
 
-export default router
+export default router;

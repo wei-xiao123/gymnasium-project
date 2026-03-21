@@ -10,6 +10,12 @@ spring:
     username: root
     password: root
 
+  servlet:
+    multipart:
+      max-file-size: 200MB #设置单个文件的大小 因为springboot内置tomact的的文件传输默认为10MB
+      max-request-size: 500MB #设置单次请求的文件总大小
+      enabled: true #设置该参数，否则不生效
+
 #mybatis plus配置
 mybatis-plus:
   configuration:
@@ -22,3 +28,8 @@ mybatis-plus:
 logging:
   pattern:
     console: '%d{yyyy-MM-dd} [%thread] %-5level %logger- %msg%n'
+# minio配置
+minio:
+  endpoint: http://127.0.0.1:9000
+  accesskey: minioadmin
+  secretKey: minioadmin

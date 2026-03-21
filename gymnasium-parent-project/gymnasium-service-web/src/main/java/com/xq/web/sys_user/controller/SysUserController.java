@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xq.utils.ResultUtils;
 import com.xq.utils.ResultVo;
+import com.xq.web.sys_role.entity.SelectType;
 import com.xq.web.sys_user.entity.PageParam;
 import com.xq.web.sys_user.entity.SysUser;
 import com.xq.web.sys_user.service.SysUserService;
@@ -130,6 +131,25 @@ public class SysUserController {
             return ResultUtils.success("重置密码成功");
         }
         return ResultUtils.error("重置密码失败");
+    }
+
+    //查询课程教练
+    @GetMapping("/getTeacher")
+    public ResultVo getTeacher(){
+        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        query.lambda().eq(SysUser::getUserType,"2");
+        List<SysUser> list = sysUserService.list(query);
+        //组装后的select数据
+        List<SelectType> selectTypeList = new ArrayList<>();
+        if(list.size() >0){
+            list.stream().forEach(item ->{
+                SelectType selectType = new SelectType();
+                selectType.setLabel(item.getNickName());
+                selectType.setValue(item.getRoleId());
+                selectTypeList.add(selectType);
+            });
+        }
+        return ResultUtils.success("查询成功",selectTypeList);
     }
 
 }
