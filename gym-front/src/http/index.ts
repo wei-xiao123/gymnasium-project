@@ -1,12 +1,14 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { ElMessage } from "element-plus";
+import { userStore } from "@/store/user";
 
 // axios 请求配置
 const config = {
   // baseURL: "http://localhost:8089", // 真实请求接口的地址
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000
+  timeout: 10000,
+  withCredentials: true //解决sesson不一致的问题
 };
 
 // 定义返回值类型
@@ -33,7 +35,7 @@ class Http {
     this.instance.interceptors.request.use(
       (config) => {
         // 在请求头部携带 token
-        const token = sessionStorage.getItem("token");
+        const token = userStore().getToken();
         if (token) {
           config.headers["token"] = token;
         }

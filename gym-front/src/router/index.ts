@@ -1,8 +1,14 @@
-import { createRouter, createWebHistory } from "vue-router";
-import type { RouteRecordRaw } from "vue-router";
-import Layout from "@/layout/Index.vue";
+import { createRouter, createWebHistory } from "vue-router"
+import type { RouteRecordRaw } from "vue-router"
+import Layout from "@/layout/Index.vue"
+import { userStore } from "@/store/user"
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/login",
+    component: () => import("@/views/login/Login.vue"),
+    name: "login",
+  },
   {
     path: "/",
     component: Layout,
@@ -228,6 +234,29 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
-export default router;
+// 路由守卫 - 检查用户是否已登录
+router.beforeEach((to, from, next) => {
+  const user = userStore()
+
+  // 如果是登录页面，直接进入
+  if (to.path === "/login") {
+    next()
+    return
+  }
+
+  // 获取 token
+  const token = user.getToken()
+
+  // 如果访问其他页面但未登录，重定向到登录页
+  if (!token || token === '') {
+    next("/login")
+    return
+  }
+
+  // 已登录，正常进入
+  next()
+})
+
+export default router

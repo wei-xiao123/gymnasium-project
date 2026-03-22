@@ -11,7 +11,6 @@ import myconfirm from './utils/myconfirm'
 
 // 实例化 Pinia
 const pinia = createPinia()
-
 const app = createApp(App)
 
 // 挂载全局属性

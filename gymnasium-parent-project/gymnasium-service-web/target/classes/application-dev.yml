@@ -24,10 +24,18 @@ mybatis-plus:
     db-config:
       #配置mybatis plus 在更新时只更新非空和非NULL的字段
       update-strategy: not_empty
+
+#jwt配置
+jwt:
+  issuer: weixiao  #颁发者
+  secret: wxlk    #秘钥
+  expiration: 30    #30分钟过期
+
 # 定义日志文件的输出格式
 logging:
   pattern:
     console: '%d{yyyy-MM-dd} [%thread] %-5level %logger- %msg%n'
+
 # minio配置
 minio:
   endpoint: http://127.0.0.1:9000
