@@ -31,9 +31,9 @@ const onConfirm = () => {
     :title="title"
     :model-value="visible"
     :before-close="onClose"
-    append-to-body
     :width="width + 'px'"
     :close-on-click-modal="false"
+    lock-scroll
   >
     <div class="container" :style="{ height: height + 'px' }">
       <slot name="content" />

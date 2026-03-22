@@ -94,7 +94,7 @@
           </el-dialog>
         </el-form-item>
         <el-form-item prop="courseDetails" label="课程详情">
-          <div style="border: 1px solid #ccc">
+          <div style="border: 1px solid #ccc; position: relative; z-index: 1;">
             <Toolbar
               style="border-bottom: 1px solid #ccc"
               :editor="editorRef"
@@ -103,7 +103,7 @@
             />
             <Editor
               v-model="valueHtml"
-              style="height: 300px; overflow-y: hidden"
+              style="height: 300px; overflow-y: hidden;"
               :defaultConfig="editorConfig"
               :mode="mode"
               @onCreated="handleCreated"
@@ -123,8 +123,7 @@ import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 import type { CourseType } from "@/api/course/CourseModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { ElMessage } from "element-plus";
-import type { FormInstance } from "element-plus";
+import { ElMessage, type FormInstance, type UploadFile } from "element-plus";
 import { nextTick, reactive, ref } from "vue";
 import useUpload from "@/composables/course/useUpload";
 import useEditor from "@/composables/course/useEditor";
@@ -139,18 +138,7 @@ const { global } = useInstance();
 const addFormRef = ref<FormInstance>();
 
 // 弹框属性
-const { dialog, onClose: useDialogClose, onShow } = useDialog();
-
-// 自定义关闭函数 - 支持关闭和刷新
-const onClose = () => {
-  useDialogClose();
-  // 编辑模式关闭时，100ms后刷新页面
-  if (addModel.type == EditType.EDIT) {
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-  }
-};
+const { dialog, onClose, onShow } = useDialog();
 
 // 教练选择
 const { teacherData, listTeacher } = useSelectTeacher();
@@ -179,68 +167,75 @@ const {
 } = useEditor();
 
 // 显示弹框
+type CourseForm = Omit<CourseType, "courseHour" | "coursePrice"> & {
+  courseHour: number | null;
+  coursePrice: number | null;
+};
+
+const resetAddModel = () => {
+  addModel.type = "";
+  addModel.courseId = "";
+  addModel.courseName = "";
+  addModel.image = "";
+  addModel.teacherName = "";
+  addModel.courseHour = null;
+  addModel.courseDetails = "";
+  addModel.coursePrice = null;
+};
+
 const show = async (type: string, row?: CourseType) => {
-  // 弹框属性
-  type == EditType.ADD
-    ? (dialog.title = Title.ADD)
-    : (dialog.title = Title.EDIT);
+  dialog.title = type === EditType.ADD ? Title.ADD : Title.EDIT;
   dialog.width = 900;
   dialog.height = 500;
 
-  // 获取教练数据列表
   await listTeacher();
-  
-  // 清空上传组件
+
   const upload = uploadRef.value;
   if (upload) {
     upload.clearFiles();
   }
-  
-  if (type == EditType.ADD) {
-    // 新增模式：清空所有数据
-    fileList.value = [];
+
+  fileList.value = [];
+  imgurl.value = "";
+
+  if (type === EditType.ADD) {
+    resetAddModel();
+    valueHtml.value = "";
     const editor = editorRef.value;
     if (editor) {
       editor.clear();
     }
-    // 确保在 nextTick 中清空所有字段
+    addFormRef.value?.clearValidate();
+  }
+
+  if (type === EditType.EDIT) {
     nextTick(() => {
-      addModel.courseId = "";
-      addModel.courseName = "";
-      addModel.courseDetails = "";
-      addModel.courseHour = "" as any;
-      addModel.coursePrice = "" as any;
-      addModel.teacherName = "";
-      addModel.image = "";
-      valueHtml.value = "";
-      addFormRef.value?.resetFields();
-    });
-  } else if (type == EditType.EDIT) {
-    // 编辑模式：回显数据
-    // 先复制数据
-    global.$objCopy(row, addModel);
-    // 设置文本编辑器数据
-    valueHtml.value = addModel.courseDetails;
-    // 清空并回显封面图
-    fileList.value = [];
-    nextTick(() => {
+      global.$objCopy(row, addModel as CourseType);
+
       if (row?.image) {
-        const obj: any = {
-          name: "",
-          url: "",
-          status: "success" as any,
-          uid: Date.now()
+        const obj: UploadFile = {
+          name: "image",
+          url: row.image,
+          status: "success",
+          uid: Date.now(),
         };
-        obj.url = row.image;
         fileList.value.push(obj);
+        imgurl.value = row.image;
       }
-    });
-    // 清除表单验证错误
-    nextTick(() => {
+
+      // 用 setTimeout 确保编辑器完全渲染后再设置内容
+      setTimeout(() => {
+        valueHtml.value = row?.courseDetails ?? "";
+        const editor = editorRef.value;
+        if (editor && typeof editor.focus === 'function') {
+          editor.focus();
+        }
+      }, 100);
+
       addFormRef.value?.clearValidate();
     });
   }
-  
+
   onShow();
   addModel.type = type;
 };
@@ -251,21 +246,19 @@ defineExpose({
 });
 
 // 表单绑定的数据对象
-const addModel = reactive<CourseType>({
+const addModel = reactive<CourseForm>({
   type: "", // 区分新增/编辑
   courseId: "",
   courseName: "",
   image: "",
   teacherName: "",
-  courseHour: "" as any,
+  courseHour: null,
   courseDetails: "",
-  coursePrice: "" as any
+  coursePrice: null,
 });
 
 const validateCourseHour = (_rule: any, value: any, callback: any) => {
-  if (value === "" || value === null || value === undefined) {
-    callback(new Error("请填写课程课时"));
-  } else if (Number(value) <= 0) {
+  if (value == null || Number(value) <= 0) {
     callback(new Error("请填写课程课时"));
   } else {
     callback();
@@ -273,9 +266,7 @@ const validateCourseHour = (_rule: any, value: any, callback: any) => {
 };
 
 const validateCoursePrice = (_rule: any, value: any, callback: any) => {
-  if (value === "" || value === null || value === undefined) {
-    callback(new Error("请填写课程价格"));
-  } else if (Number(value) <= 0) {
+  if (value == null || Number(value) <= 0) {
     callback(new Error("请填写课程价格"));
   } else {
     callback();
@@ -346,8 +337,8 @@ const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
       const res = addModel.type == EditType.ADD
-        ? await addApi(addModel)
-        : await editApi(addModel);
+        ? await addApi(addModel as CourseType)
+        : await editApi(addModel as CourseType);
         
       if (res && res.code == 200) {
         ElMessage.success(res.msg);

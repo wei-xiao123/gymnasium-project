@@ -6,10 +6,14 @@ export default function useEditor() {
 
   const editorRef = shallowRef();
   const valueHtml = ref("");
-  const toolbarConfig = {};
+  const toolbarConfig = {
+    excludeKeys: []
+  };
   const editorConfig: Partial<IEditorConfig> = {
     MENU_CONF: {},
-    placeholder: "请输入内容..."
+    placeholder: "请输入内容...",
+    readOnly: false,
+    autoFocus: false
   };
 
   // 上传图片的配置
@@ -18,12 +22,20 @@ export default function useEditor() {
     fieldName: "file",
     // 上传图片后端地址
     server: `${import.meta.env.VITE_API_BASE_URL}/api/upload/uploadImage`,
+    // 携带鉴权头
+    headers: (() => {
+      const token = sessionStorage.getItem("token");
+      return token ? { token } : {};
+    })(),
     // 自定义插入图片
     customInsert(res: any, insertFn: InsertFnType) {
       // res 即服务端的返回结果
-      console.log("路径:", `${import.meta.env.VITE_API_BASE_URL}${res.data.msg}`);
-      // 从 res 中找到 url alt href，然后插入图片
-      insertFn(res.data.msg);
+      const urlFromRes = res?.data?.msg || res?.data?.url;
+      if (!urlFromRes) return;
+      const fullUrl = urlFromRes.startsWith("http")
+        ? urlFromRes
+        : `${import.meta.env.VITE_API_BASE_URL}${urlFromRes}`;
+      insertFn(fullUrl);
     }
   };
 
@@ -36,6 +48,12 @@ export default function useEditor() {
 
   const handleCreated = (editor: any) => {
     editorRef.value = editor; // 记录 editor 实例，重要！
+    // 延迟获得焦点，确保 DOM 完全渲染
+    setTimeout(() => {
+      if (editor && typeof editor.focus === 'function') {
+        editor.focus();
+      }
+    }, 100);
   };
 
   return {
