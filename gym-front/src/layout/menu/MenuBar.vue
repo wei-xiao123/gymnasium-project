@@ -175,49 +175,71 @@ let menuList = reactive([
     ]
   },
   {
-path: "/goodsRoot",
-component: "Layout",
-name: "goodsRoot",
-meta: {
-title: "商品管理",
-icon: "Calendar",
-roles: ["sys:goodsRoot"],
-},
-children: [
-{
-path: "/goodsList",
-component: "/goods/GoodsList",
-name: "goodsList",
-meta: {
-title: "商品列表",
-icon: "UserFilled",
-roles: ["sys:goodsList"],
-}
-}
-]
-},
-{
-path: "/lostRoot",
-component: "Layout",
-name: "lostRoot",
-meta: {
-title: "失物招领",
-icon: "Document",
-roles: ["sys:lostRoot"],
-},
-children: [
-{
-path: "/lostList",
-component: "/goods/LostList",
-name: "lostList",
-meta: {
-title: "失物列表",
-icon: "UserFilled",
-roles: ["sys:lostList"],
-},
-}
-],
-},
+    path: "/goodsRoot",
+    component: "Layout",
+    name: "goodsRoot",
+    meta: {
+      title: "商品管理",
+      icon: "Calendar",
+      roles: ["sys:goodsRoot"],
+    },
+    children: [
+      {
+        path: "/goodsList",
+        component: "/goods/GoodsList",
+        name: "goodsList",
+        meta: {
+          title: "商品列表",
+          icon: "UserFilled",
+          roles: ["sys:goodsList"],
+        }
+      }
+    ],
+  },
+  {
+    path: "/lostRoot",
+    component: "Layout",
+    name: "lostRoot",
+    meta: {
+      title: "失物招领",
+      icon: "Document",
+      roles: ["sys:lostRoot"],
+    },
+    children: [
+      {
+        path: "/lostList",
+        component: "/goods/LostList",
+        name: "lostList",
+        meta: {
+          title: "失物列表",
+          icon: "UserFilled",
+          roles: ["sys:lostList"],
+        }
+      }
+    ],
+  },
+  {
+    path: "/suggestRoot",
+    component: "Layout",
+    name: "suggestRoot",
+    meta: {
+      title: "反馈管理",
+      icon: "Document",
+      roles: ["sys:suggestRoot"],
+    },
+    children: [
+      {
+        path: "/suggestList",
+        component: "/suggest/SuggestList",
+        name: "suggestList",
+        meta: {
+          title: "反馈列表",
+          icon: "UserFilled",
+          roles: ["sys:suggestList"],
+        }
+      }
+    ],
+  },
 ]);
 
 </script>

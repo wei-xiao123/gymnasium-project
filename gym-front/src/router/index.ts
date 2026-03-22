@@ -14,10 +14,10 @@ const routes: Array<RouteRecordRaw> = [
         name: "dashboard",
         meta: {
           title: "首页",
-          icon: "#icondashboard"
-        }
-      }
-    ]
+          icon: "#icondashboard",
+        },
+      },
+    ],
   },
   {
     path: "/system",
@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: "系统管理",
       icon: "el-icon-menu",
-      roles: ["sys:manage"]
+      roles: ["sys:manage"],
     },
     children: [
       {
@@ -36,8 +36,8 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "员工管理",
           icon: "el-icon-s-custom",
-          roles: ["sys:user"]
-        }
+          roles: ["sys:user"],
+        },
       },
       {
         path: "/roleList",
@@ -46,8 +46,8 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "角色管理",
           icon: "el-icon-s-tools",
-          roles: ["sys:role"]
-        }
+          roles: ["sys:role"],
+        },
       },
       {
         path: "/menuList",
@@ -56,10 +56,10 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "权限管理",
           icon: "el-icon-document",
-          roles: ["sys:menu"]
-        }
-      }
-    ]
+          roles: ["sys:menu"],
+        },
+      },
+    ],
   },
   {
     path: "/memberRoot",
@@ -68,7 +68,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: "会员管理",
       icon: "Setting",
-      roles: ["sys:memberRoot"]
+      roles: ["sys:memberRoot"],
     },
     children: [
       {
@@ -78,8 +78,8 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "会员卡类型",
           icon: "UserFilled",
-          roles: ["sys:cardType"]
-        }
+          roles: ["sys:cardType"],
+        },
       },
       {
         path: "/memberList",
@@ -88,8 +88,8 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "会员管理",
           icon: "Wallet",
-          roles: ["sys:memberList"]
-        }
+          roles: ["sys:memberList"],
+        },
       },
       {
         path: "/myFee",
@@ -98,10 +98,10 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "我的充值",
           icon: "Menu",
-          roles: ["sys:myFee"]
-        }
-      }
-    ]
+          roles: ["sys:myFee"],
+        },
+      },
+    ],
   },
   {
     path: "/courseRoot",
@@ -110,7 +110,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: "课程管理",
       icon: "Document",
-      roles: ["sys:courseRoot"]
+      roles: ["sys:courseRoot"],
     },
     children: [
       {
@@ -120,8 +120,8 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "课程列表",
           icon: "UserFilled",
-          roles: ["sys:courseList"]
-        }
+          roles: ["sys:courseList"],
+        },
       },
       {
         path: "/mycourse",
@@ -130,10 +130,10 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "我的课程",
           icon: "Wallet",
-          roles: ["sys:mycourse"]
-        }
-      }
-    ]
+          roles: ["sys:mycourse"],
+        },
+      },
+    ],
   },
   {
     path: "/materialRoot",
@@ -142,7 +142,7 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       title: "器材管理",
       icon: "Document",
-      roles: ["sys:materialRoot"]
+      roles: ["sys:materialRoot"],
     },
     children: [
       {
@@ -152,60 +152,82 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           title: "器材列表",
           icon: "UserFilled",
-          roles: ["sys:materialList"]
-        }
-      }
-    ]
+          roles: ["sys:materialList"],
+        },
+      },
+    ],
   },
   {
-path: "/goodsRoot",
-component: Layout,
-name: "goodsRoot",
-meta: {
-title: "商品管理",
-icon: "Document",
-roles: ["sys:goodsRoot"],
-},
-children: [
-{
-path: "/goodsList",
-component: () => import('@/views/goods/GoodsList.vue'),
-name: "goodsList",
-meta: {
-title: "商品列表",
-icon: "UserFilled",
-roles: ["sys:goodsList"],
-},
-},
-]
-},
-{
-path: "/lostRoot",
-component: Layout,
-name: "lostRoot",
-meta: {
-title: "失物招领",
-icon: "Document",
-roles: ["sys:lostRoot"],
-},
-children: [
-{
-path: "/lostList",
-component: () => import('@/views/lost/LostList.vue'),
-name: "lostList",
-meta: {
-title: "失物列表",
-icon: "UserFilled",
-roles: ["sys:lostList"],
-},
-}
-]
-},
+    path: "/goodsRoot",
+    component: Layout,
+    name: "goodsRoot",
+    meta: {
+      title: "商品管理",
+      icon: "Document",
+      roles: ["sys:goodsRoot"],
+    },
+    children: [
+      {
+        path: "/goodsList",
+        component: () => import("@/views/goods/GoodsList.vue"),
+        name: "goodsList",
+        meta: {
+          title: "商品列表",
+          icon: "UserFilled",
+          roles: ["sys:goodsList"],
+        },
+      },
+    ],
+  },
+  {
+    path: "/lostRoot",
+    component: Layout,
+    name: "lostRoot",
+    meta: {
+      title: "失物招领",
+      icon: "Document",
+      roles: ["sys:lostRoot"],
+    },
+    children: [
+      {
+        path: "/lostList",
+        component: () => import("@/views/lost/LostList.vue"),
+        name: "lostList",
+        meta: {
+          title: "失物列表",
+          icon: "UserFilled",
+          roles: ["sys:lostList"],
+        },
+      },
+    ],
+  },
+  {
+    path: "/suggestRoot",
+    component: Layout,
+    name: "suggestRoot",
+    meta: {
+      title: "反馈管理",
+      icon: "Document",
+      roles: ["sys:suggestRoot"],
+    },
+    children: [
+      {
+        path: "/suggestList",
+        component: () => import("@/views/suggest/SuggestList.vue"),
+        name: "suggestList",
+        meta: {
+          title: "反馈列表",
+          icon: "UserFilled",
+          roles: ["sys:suggestList"],
+        },
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
 export default router;
