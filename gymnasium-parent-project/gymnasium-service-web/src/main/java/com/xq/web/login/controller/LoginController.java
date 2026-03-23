@@ -5,12 +5,19 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.xq.jwt.JwtUtils;
 import com.xq.utils.ResultUtils;
 import com.xq.utils.ResultVo;
+import com.xq.web.login.entity.InfoParam;
 import com.xq.web.login.entity.LoginParam;
 import com.xq.web.login.entity.LoginResult;
+import com.xq.web.login.entity.UserInfo;
 import com.xq.web.member.entity.Member;
 import com.xq.web.member.service.MemberService;
+import com.xq.web.sys_menu.entity.MakeMenuTree;
+import com.xq.web.sys_menu.entity.RouterVo;
+import com.xq.web.sys_menu.entity.SysMenu;
+import com.xq.web.sys_menu.service.SysMenuService;
 import com.xq.web.sys_user.entity.SysUser;
 import com.xq.web.sys_user.service.SysUserService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/login")
@@ -67,8 +75,12 @@ public class LoginController {
 
     @Autowired
     SysUserService sysUserService;
+
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    SysMenuService sysMenuService;
 
     //登录
     @PostMapping("/login")
@@ -134,4 +146,85 @@ public class LoginController {
             return ResultUtils.error("用户类型错误!");
         }
     }
+
+    //查询用户信息
+    @GetMapping("/getInfo")
+    public ResultVo getInfo(InfoParam param) {
+        UserInfo userInfo = new UserInfo();
+        if (param.getUserType().equals("1")) { //会员
+            //根据会员id查询权限字段
+            List<SysMenu> menuList = sysMenuService.getMenuByMemberId(param.getUserId());
+            //获取全部的code字段
+            List<String> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                            .stream()
+                            .map(item -> item.getCode())
+                            .filter(item -> item != null)
+                            .collect(Collectors.toList());
+            //转为数组
+            String[] strings = collect.toArray(new String[collect.size()]);
+            //查询用户信息
+            Member member = memberService.getById(param.getUserId());
+            //设置返回信息
+            userInfo.setName(member.getName());
+            userInfo.setUserId(member.getMemberId());
+            userInfo.setPermissons(strings);
+            return ResultUtils.success("查询成功", userInfo);
+        } else if (param.getUserType().equals("2")) {//员工
+            //查询用户信息
+            SysUser user = sysUserService.getById(param.getUserId());
+            List<SysMenu> menuList = null;
+            if (StringUtils.isNotEmpty(user.getIsAdmin()) && user.getIsAdmin().equals("1")) { //超级管理员
+                menuList = sysMenuService.list();
+            } else {
+                menuList = sysMenuService.getMenuByUserId(user.getUserId());
+            }
+            //获取全部的code字段
+            List<String> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                            .stream()
+                            .map(item -> item.getCode())
+                            .filter(item -> item != null)
+                            .collect(Collectors.toList());
+            //转为数组
+            String[] strings = collect.toArray(new String[collect.size()]);
+            //设置返回信息
+            userInfo.setName(user.getNickName());
+            userInfo.setUserId(user.getUserId());
+            userInfo.setPermissons(strings);
+            return ResultUtils.success("查询成功", userInfo);
+        } else {
+            return ResultUtils.error("用户类型错误!");
+        }
+    }
+
+    @GetMapping("/getMenuList")
+    public ResultVo getMenuList(InfoParam param) {
+        if (param.getUserType().equals("1")) { //会员
+            List<SysMenu> menus = sysMenuService.getMenuByMemberId(param.getUserId());
+            //获取菜单和目录
+            List<SysMenu> collect = Optional.ofNullable(menus).orElse(new ArrayList<>())
+                            .stream()
+                            .filter(item -> item != null && !item.getType().equals("2")).collect(Collectors.toList());
+            List<RouterVo> rourer = MakeMenuTree.makeRouter(collect,0L);
+            return ResultUtils.success("查询成功", rourer);
+        } else if (param.getUserType().equals("2")) { //员工
+            SysUser user = sysUserService.getById(param.getUserId());
+            List<SysMenu> menuList = null;
+            if
+            (org.apache.commons.lang3.StringUtils.isNotEmpty(user.getIsAdmin(
+            )) && user.getIsAdmin().equals("1")) {
+                menuList = sysMenuService.list();
+            } else {
+                menuList = sysMenuService.getMenuByUserId(param.getUserId());
+            }
+            //获取菜单和目录
+            List<SysMenu> collect = Optional.ofNullable(menuList).orElse(new ArrayList<>())
+                            .stream()
+                            .filter(item -> item != null && !item.getType().equals("2")).collect(Collectors.toList());
+            List<RouterVo> rourer = MakeMenuTree.makeRouter(collect, 0L);
+            return ResultUtils.success("查询成功", rourer);
+        } else {
+            return ResultUtils.error("用户类型错误!");
+        }
+    }
+
 }
