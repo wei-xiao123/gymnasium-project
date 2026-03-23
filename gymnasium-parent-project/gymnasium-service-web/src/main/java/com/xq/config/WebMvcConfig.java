@@ -15,11 +15,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("*")
+                .allowedOrigins("http://localhost:5173", "http://localhost:8080")  // 指定具体的前端地址
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
+                .exposedHeaders("Authorization")  // 暴露必要的响应头
                 .maxAge(3600)
-                .allowCredentials(true);
+                .allowCredentials(true);  // 允许发送 Cookie，必须指定具体的源
     }
 
     @Override

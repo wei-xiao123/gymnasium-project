@@ -44,7 +44,7 @@ const { global } = useInstance();
 const addFormRef = ref<FormInstance>();
 
 // 弹框属性
-const { dialog, onClose: useDialogClose, onShow } = useDialog();
+const { dialog, onClose, onShow } = useDialog();
 
 // 弹框绑定的对象
 const addModel = reactive<MaterialType>({
@@ -54,17 +54,6 @@ const addModel = reactive<MaterialType>({
   details: "",
   id: ""
 });
-
-// 自定义关闭函数 - 支持关闭和刷新
-const onClose = () => {
-  useDialogClose();
-  // 编辑模式关闭时，100ms后刷新页面
-  if (addModel.type == EditType.EDIT) {
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-  }
-};
 
 // 定义方法给外部使用
 const show = (type: string, row?: MaterialType) => {
@@ -77,18 +66,15 @@ const show = (type: string, row?: MaterialType) => {
 
   if (type == EditType.ADD) {
     // 新增模式：清空所有数据
-    nextTick(() => {
-      addModel.id = "";
-      addModel.name = "";
-      addModel.details = "";
-      addModel.numTotal = "" as any;
-      addFormRef.value?.resetFields();
-    });
+    addModel.id = "";
+    addModel.name = "";
+    addModel.details = "";
+    addModel.numTotal = "" as any;
+    addFormRef.value?.resetFields();
   } else if (type == EditType.EDIT) {
     // 编辑模式：回显数据
-    global.$objCopy(row, addModel);
-    // 清除表单验证错误
     nextTick(() => {
+      global.$objCopy(row, addModel);
       addFormRef.value?.clearValidate();
     });
   }

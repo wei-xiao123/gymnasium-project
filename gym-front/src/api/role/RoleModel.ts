@@ -6,10 +6,21 @@ export type AddRoleModel = {
   remark: string
   types: string
 }
+
 //列表查询参数类型
 export type ListParam = {
     roleName:string,
     currentPage:number,
     pageSize:number,
     total:number
+}
+
+export type AssignParam = {
+  roleId:string,
+  userId:string
+}
+
+export type SaveAssignParam = {
+  roleId:string,
+  list:Array<string>
 }

@@ -14,9 +14,8 @@
     </div>
 
     <!-- 表格数据 -->
-    <el-table :height="tableHeight" :data="tableList.list" row-key="menuId"
+    <el-table :data="tableList.list" row-key="menuId"
       :tree-props="{ children: 'children', hasChildren: 'hasChildren' }" border
-      default-expand-all
       stripe
     >
       <el-table-column prop="title" label="菜单名称"></el-table-column>
@@ -62,7 +61,7 @@ import useMenu from "@/composables/menu/useMenu";
 import useMenuTable from "@/composables/menu/useMenuTable";
 
 // 表格数据
-const { tableList, tableHeight, refresh, getList } = useMenuTable();
+const { tableList, refresh, getList } = useMenuTable();
 
 // 新增、编辑、删除功能
 const { addBtn, editBtn, deleteBtn, addRef } = useMenu(getList);

@@ -1,25 +1,31 @@
 import type { AddRoleModel } from '@/api/role/RoleModel'
 import { EditType } from '@/type/BaseEnum'
 import type { FuncList } from '@/type/BaseType'
-import { ref } from 'vue'
+import type { Ref } from 'vue'
 import { deleteApi } from '@/api/role'
 import { ElMessage } from 'element-plus'
 import useInstance from '@/hooks/useInstance'
 
-export default function useRole(getList: FuncList) {
+interface UseRoleOptions {
+  addRef?: Ref<any>
+  assignRoleRef?: Ref<any>
+}
+
+export default function useRole(getList: FuncList, options?: UseRoleOptions) {
   const { global } = useInstance()
 
-  // 新增、编辑组件ref属性
-  const addRef = ref<{ show: (type: string, row?: AddRoleModel) => void }>()
+  // 使用外部提供的 refs 或创建内部 refs
+  const addRef = options?.addRef
+  const assignRoleRef = options?.assignRoleRef
 
   // 新增
   const addBtn = () => {
-    addRef.value?.show(EditType.ADD)
+    addRef?.value?.show(EditType.ADD)
   }
 
   // 编辑
   const editBtn = (row: AddRoleModel) => {
-    addRef.value?.show(EditType.EDIT, row)
+    addRef?.value?.show(EditType.EDIT, row)
   }
 
   // 删除
@@ -34,10 +40,16 @@ export default function useRole(getList: FuncList) {
     }
   }
 
+  //分配权限按钮
+  const assignBtn = (row: AddRoleModel) => {
+      assignRoleRef?.value?.show(row.roleId, row.roleName)
+  }
+
   return {
     addBtn,
     editBtn,
     deleteBtn,
-    addRef,
+    assignBtn,
   }
+
 }

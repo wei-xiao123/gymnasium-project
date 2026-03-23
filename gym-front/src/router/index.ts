@@ -36,7 +36,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/userList",
+        path: "userList",
         component: () => import("@/views/system/UserList.vue"),
         name: "userList",
         meta: {
@@ -46,7 +46,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/roleList",
+        path: "roleList",
         component: () => import("@/views/system/RoleList.vue"),
         name: "roleList",
         meta: {
@@ -56,7 +56,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/menuList",
+        path: "menuList",
         component: () => import("@/views/system/MenuList.vue"),
         name: "menuList",
         meta: {
@@ -78,7 +78,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/cardType",
+        path: "cardType",
         component: () => import("@/views/member/CardType.vue"),
         name: "cardType",
         meta: {
@@ -88,7 +88,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/memberList",
+        path: "memberList",
         component: () => import("@/views/member/MemberList.vue"),
         name: "memberList",
         meta: {
@@ -98,7 +98,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/myFee",
+        path: "myFee",
         component: () => import("@/views/member/MyFee.vue"),
         name: "myFee",
         meta: {
@@ -120,7 +120,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/courseList",
+        path: "courseList",
         component: () => import("@/views/course/CourseList.vue"),
         name: "courseList",
         meta: {
@@ -130,7 +130,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/mycourse",
+        path: "mycourse",
         component: () => import("@/views/mycourse/MyCourse.vue"),
         name: "mycourse",
         meta: {
@@ -152,7 +152,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/materialList",
+        path: "materialList",
         component: () => import("@/views/material/MaterialList.vue"),
         name: "materialList",
         meta: {
@@ -174,7 +174,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/goodsList",
+        path: "goodsList",
         component: () => import("@/views/goods/GoodsList.vue"),
         name: "goodsList",
         meta: {
@@ -196,7 +196,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/lostList",
+        path: "lostList",
         component: () => import("@/views/lost/LostList.vue"),
         name: "lostList",
         meta: {
@@ -218,7 +218,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "/suggestList",
+        path: "suggestList",
         component: () => import("@/views/suggest/SuggestList.vue"),
         name: "suggestList",
         meta: {
@@ -237,7 +237,7 @@ const router = createRouter({
 })
 
 // 路由守卫 - 检查用户是否已登录
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const user = userStore()
 
   // 如果是登录页面，直接进入

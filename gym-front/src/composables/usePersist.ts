@@ -1,4 +1,4 @@
-import { ref, watch, type Ref } from 'vue'
+import { ref, watch } from 'vue'
 
 /**
  * 创建一个自动持久化的 ref 对象

@@ -24,8 +24,8 @@
           <el-col :span="12">
             <el-form-item prop="sex" label="性别">
               <el-radio-group v-model="addModel.sex">
-                <el-radio :label="'0'">男</el-radio>
-                <el-radio :label="'1'">女</el-radio>
+                <el-radio :value="'0'">男</el-radio>
+                <el-radio :value="'1'">女</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -53,8 +53,8 @@
           <el-col :span="12">
             <el-form-item prop="userType" label="类型">
               <el-radio-group v-model="addModel.userType">
-                <el-radio :label="'1'">员工</el-radio>
-                <el-radio :label="'2'">教练</el-radio>
+                <el-radio :value="'1'">员工</el-radio>
+                <el-radio :value="'2'">教练</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -80,8 +80,8 @@
           <el-col :span="12">
             <el-form-item prop="status" label="状态">
               <el-radio-group v-model="addModel.status">
-                <el-radio :label="'0'">停用</el-radio>
-                <el-radio :label="'1'">启用</el-radio>
+                <el-radio :value="'0'">停用</el-radio>
+                <el-radio :value="'1'">启用</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -108,7 +108,7 @@
 import type { AddUserModel } from "@/api/user/UserModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { reactive, ref } from "vue";
+import { reactive, ref, nextTick } from "vue";
 import useSelectRole from "@/composables/user/useSelectRole";
 import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
@@ -140,7 +140,7 @@ const addModel = reactive<AddUserModel>({
   email: "",
   sex: "",
   userType: "",
-  status: "",
+  status: "1",
   salary: "",
   nickName: ""
 });
@@ -218,36 +218,46 @@ const emits = defineEmits(["refresh"]);
 // 显示弹框
 const show = async (type: string, row?: AddUserModel) => {
   dialog.height = 270;
-
+  addModel.type = type;
   // 设置弹框标题
   dialog.title = type === EditType.ADD ? Title.ADD : Title.EDIT;
 
   if (type === EditType.ADD) {
     // 新增时清空表单
-    Object.keys(addModel).forEach((key) => {
-      (addModel as any)[key] = "";
-    });
+    addModel.userId = "";
+    addModel.roleId = "";
+    addModel.username = "";
+    addModel.password = "";
+    addModel.phone = "";
+    addModel.email = "";
+    addModel.sex = "";
+    addModel.userType = "";
+    addModel.status = "1";
+    addModel.salary = "";
+    addModel.nickName = "";
+    
     // 获取角色数据列表
     await listRole();
+    
+    // 在显示弹框后清除验证
+    await nextTick();
     addFormRef.value?.clearValidate();
   } else if (type === EditType.EDIT && row) {
     // 编辑时回显数据
     // 1. 先获取角色数据列表
     await listRole();
-    // 2. 清空表单
-    Object.keys(addModel).forEach((key) => {
-      (addModel as any)[key] = "";
-    });
-    // 3. 复制员工数据到表单
+    // 2. 复制员工数据到表单
     global.$objCopy(row, addModel);
-    // 4. 根据员工 ID 获取该员工的角色 ID
+    // 3. 根据员工 ID 获取该员工的角色 ID
     await getRole(row.userId);
-    // 5. 设置角色字段
+    // 4. 设置角色字段
     addModel.roleId = roleId.value;
+    
+    // 在显示弹框后清除验证
+    await nextTick();
     addFormRef.value?.clearValidate();
   }
 
-  addModel.type = type;
   onShow();
 };
 

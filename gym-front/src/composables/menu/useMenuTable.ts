@@ -1,10 +1,8 @@
-import { onMounted, reactive, ref, nextTick } from "vue";
+import { onMounted, reactive } from "vue";
 import { getListApi } from "@/api/menu";
+import { ElMessage } from "element-plus";
 
 export default function useMenuTable() {
-  // 表格高度
-  const tableHeight = ref(0);
-
   // 定义表格数据
   const tableList = reactive({
     list: [],
@@ -12,9 +10,18 @@ export default function useMenuTable() {
 
   // 获取表格数据
   const getList = async () => {
-    const res = await getListApi();
-    if (res && res.code == 200) {
-      tableList.list = res.data;
+    try {
+      const res = await getListApi();
+      if (res && res.code === 200) {
+        tableList.list = res.data || [];
+      } else {
+        ElMessage.error(res?.msg || "加载菜单列表失败");
+        tableList.list = [];
+      }
+    } catch (error) {
+      console.error("加载菜单列表错误:", error);
+      ElMessage.error("加载菜单列表失败");
+      tableList.list = [];
     }
   };
 
@@ -25,15 +32,11 @@ export default function useMenuTable() {
 
   onMounted(() => {
     getList();
-    nextTick(() => {
-      tableHeight.value = window.innerHeight - 200;
-    });
   });
 
   return {
     tableList,
     getList,
-    tableHeight,
     refresh,
   };
 }

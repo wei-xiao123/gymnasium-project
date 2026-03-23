@@ -47,7 +47,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: '/userList',
+        path: '/system/userList',
         component: '/system/User/UserList',
         name: 'userList',
         meta: {
@@ -57,7 +57,7 @@ let menuList = reactive([
         },
       },
       {
-        path: '/roleList',
+        path: '/system/roleList',
         component: '/system/Role/RoleList',
         name: 'roleList',
         meta: {
@@ -67,7 +67,7 @@ let menuList = reactive([
         },
       },
       {
-        path: '/menuList',
+        path: '/system/menuList',
         component: '/system/Menu/MenuList',
         name: 'menuList',
         meta: {
@@ -89,7 +89,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: '/cardType',
+        path: '/memberRoot/cardType',
         component: '/member/CardType',
         name: 'cardType',
         meta: {
@@ -99,7 +99,7 @@ let menuList = reactive([
         },
       },
       {
-        path: '/memberList',
+        path: '/memberRoot/memberList',
         component: '/member/MemberList',
         name: 'memberList',
         meta: {
@@ -109,7 +109,7 @@ let menuList = reactive([
         },
       },
       {
-        path: '/myFee',
+        path: '/memberRoot/myFee',
         component: '/system/MyFee',
         name: 'myFee',
         meta: {
@@ -131,7 +131,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: "/courseList",
+        path: "/courseRoot/courseList",
         component: "/course/CourseList",
         name: "courseList",
         meta: {
@@ -141,7 +141,7 @@ let menuList = reactive([
         }
       },
       {
-        path: "/mycourse",
+        path: "/courseRoot/mycourse",
         component: "/mycourse/mycourse",
         name: "mycourse",
         meta: {
@@ -163,7 +163,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: "/materialList",
+        path: "/materialRoot/materialList",
         component: "/material/MaterialList",
         name: "materialList",
         meta: {
@@ -185,7 +185,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: "/goodsList",
+        path: "/goodsRoot/goodsList",
         component: "/goods/GoodsList",
         name: "goodsList",
         meta: {
@@ -207,7 +207,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: "/lostList",
+        path: "/lostRoot/lostList",
         component: "/goods/LostList",
         name: "lostList",
         meta: {
@@ -229,7 +229,7 @@ let menuList = reactive([
     },
     children: [
       {
-        path: "/suggestList",
+        path: "/suggestRoot/suggestList",
         component: "/suggest/SuggestList",
         name: "suggestList",
         meta: {

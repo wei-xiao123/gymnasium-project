@@ -77,6 +77,12 @@ public class LoginController {
         HttpSession session = request.getSession();
         //获取验证码
         String code = (String) session.getAttribute("code");
+
+        // 添加 null 检查
+        if(code == null || code.isEmpty()){
+            return ResultUtils.error("验证码已过期，请重新获取!");
+        }
+
         //验证验证码
         if(!code.equals(loginParam.getCode())){
             return ResultUtils.error("验证码错误!");

@@ -3,10 +3,10 @@ package com.xq.web.sys_role.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xq.utils.ResultUtils;
 import com.xq.utils.ResultVo;
-import com.xq.web.sys_role.entity.RoleParam;
-import com.xq.web.sys_role.entity.SelectType;
-import com.xq.web.sys_role.entity.SysRole;
+import com.xq.web.sys_role.entity.*;
 import com.xq.web.sys_role.service.SysRoleService;
+import com.xq.web.sys_role_menu.entity.SaveMenuParam;
+import com.xq.web.sys_role_menu.service.RoleMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +17,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/role")
 public class SysRoleController {
+
     @Autowired
     private SysRoleService sysRoleService;
+    @Autowired
+    private RoleMenuService roleMenuService;
+
     //新增角色
     @PostMapping
     public ResultVo addRole(@RequestBody SysRole role){
@@ -68,5 +72,18 @@ public class SysRoleController {
             });
         }
         return ResultUtils.success("查询成功",selectTypeList);
+    }
+    //分配权限树数据回显查询
+    @GetMapping("/getMenuTree")
+    public ResultVo getMenuTree(RoleAssignParam param){
+        RolePermissionVo tree = sysRoleService.getMenuTree(param);
+        return ResultUtils.success("查询成功",tree);
+    }
+
+    //分配权限保存
+    @PostMapping("/saveRoleMenu")
+    public ResultVo saveRoleMenu(@RequestBody SaveMenuParam param){
+        roleMenuService.saveMenu(param);
+        return ResultUtils.success("权限分配成功");
     }
 }

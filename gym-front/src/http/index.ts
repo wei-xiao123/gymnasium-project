@@ -51,74 +51,62 @@ class Http {
     // 响应拦截器
     this.instance.interceptors.response.use(
       (res: AxiosResponse) => {
-        if (res.data.code !== 200) {
-          ElMessage.error(res.data.msg || "服务器出错!");
-          return Promise.reject(res.data.msg || "服务器出错");
-        } else {
-          return res.data;
-        }
+        // 直接返回响应数据，由调用方处理业务逻辑
+        // 不在这里弹窗提示
+        return res.data;
       },
       (error) => {
-        error.data = {};
+        // 只处理网络错误，此时才弹窗
+        let errorMsg = "连接到服务器失败";
+        
         if (error && error.response) {
           switch (error.response.status) {
             case 400:
-              error.data.msg = "错误请求";
-              ElMessage.error(error.data.msg);
+              errorMsg = "错误请求";
               break;
             case 401:
-              error.data.msg = "未授权，请重新登录";
-              ElMessage.error(error.data.msg);
+              errorMsg = "未授权，请重新登录";
               break;
             case 403:
-              error.data.msg = "拒绝访问";
-              ElMessage.error(error.data.msg);
+              errorMsg = "拒绝访问";
               break;
             case 404:
-              error.data.msg = "请求错误，未找到该资源";
-              ElMessage.error(error.data.msg);
+              errorMsg = "请求错误，未找到该资源";
               break;
             case 405:
-              error.data.msg = "请求方法未允许";
-              ElMessage.error(error.data.msg);
+              errorMsg = "请求方法未允许";
               break;
             case 408:
-              error.data.msg = "请求超时";
-              ElMessage.error(error.data.msg);
+              errorMsg = "请求超时";
               break;
             case 500:
-              error.data.msg = "服务器端出错";
-              ElMessage.error(error.data.msg);
+              errorMsg = "服务器端出错";
               break;
             case 501:
-              error.data.msg = "网络未实现";
-              ElMessage.error(error.data.msg);
+              errorMsg = "网络未实现";
               break;
             case 502:
-              error.data.msg = "网络错误";
-              ElMessage.error(error.data.msg);
+              errorMsg = "网络错误";
               break;
             case 503:
-              error.data.msg = "服务不可用";
-              ElMessage.error(error.data.msg);
+              errorMsg = "服务不可用";
               break;
             case 504:
-              error.data.msg = "网络超时";
-              ElMessage.error(error.data.msg);
+              errorMsg = "网络超时";
               break;
             case 505:
-              error.data.msg = "HTTP 版本不支持该请求";
-              ElMessage.error(error.data.msg);
+              errorMsg = "HTTP 版本不支持该请求";
               break;
             default:
-              error.data.msg = `连接错误${error.response.status}`;
-              ElMessage.error(error.data.msg);
+              errorMsg = error.response.data?.msg || `连接错误${error.response.status}`;
           }
-        } else {
-          error.data.msg = "连接到服务器失败";
-          ElMessage.error(error.data.msg);
+        } else if (error.request) {
+          // 请求已发送但未收到响应
+          errorMsg = "未收到服务器响应";
         }
-        return Promise.reject(error);
+        
+        ElMessage.error(errorMsg);
+        return Promise.reject(errorMsg);
       }
     );
   }

@@ -44,8 +44,8 @@
 
       <el-form-item label="用户类型">
         <el-radio-group v-model="loginModel.userType">
-          <el-radio label="1">会员</el-radio>
-          <el-radio label="2">员工</el-radio>
+          <el-radio value="1">会员</el-radio>
+          <el-radio value="2">员工</el-radio>
         </el-radio-group>
       </el-form-item>
 
@@ -105,6 +105,7 @@ const onSubmit = async () => {
 
   try {
     const res = await loginApi(loginModel)
+    // 业务成功
     if (res && res.code === 200) {
       // 保存登录信息
       store.setToken(res.data.token)
@@ -117,11 +118,15 @@ const onSubmit = async () => {
         router.push({ path: "/dashboard" })
       }, 500)
     } else {
+      // 业务错误（后端返回 code !== 200）
       ElMessage.error(res?.msg || "登录失败")
+      // 登录失败时，清空验证码输入框并重新获取验证码图片
+      loginModel.code = ""
+      getImage()
     }
   } catch (error) {
-    console.error("登录错误:", error)
-    ElMessage.error("登录请求失败，请检查服务器连接")
+    // 网络错误，拦截器已经弹窗提示，这里只记录错误
+    console.error("登录网络错误:", error)
   }
 }
 </script>

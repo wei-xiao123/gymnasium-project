@@ -8,6 +8,7 @@ import { createPinia } from 'pinia'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import objCopy from './utils/objCopy'
 import myconfirm from './utils/myconfirm'
+import permissionDirective from '@/directives/permission'
 
 // 实例化 Pinia
 const pinia = createPinia()
@@ -16,6 +17,9 @@ const app = createApp(App)
 // 挂载全局属性
 app.config.globalProperties.$objCopy = objCopy
 app.config.globalProperties.$myconfirm = myconfirm
+
+// 注册全局指令
+app.directive('permission', permissionDirective)
 
 app.use(router)
   .use(ElementPlus, {

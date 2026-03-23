@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type { TabPaneName } from 'element-plus'
 import { tabStore } from '@/store/tabs'
@@ -28,7 +28,7 @@ const store = tabStore()
 
 // 获取 tabs 数据
 const tabsList = computed(() => {
-  return store.getTabs
+  return store.getTabs()
 })
 
 // 当前激活的选项卡
@@ -56,9 +56,12 @@ const removeTab = (targetName: TabPaneName) => {
     })
   }
 
-  activeTab.value = activeName
   store.tabList = tabs.filter((tab: Tab) => tab.path !== targetName)
-  router.push({ path: activeName })
+  
+  nextTick(() => {
+    activeTab.value = activeName
+    router.push({ path: activeName })
+  })
 }
 
 // 添加选项卡
@@ -75,8 +78,10 @@ const addTab = () => {
 watch(
   () => route.path,
   () => {
-    setActiveTab()
-    addTab()
+    nextTick(() => {
+      setActiveTab()
+      addTab()
+    })
   }
 )
 
@@ -88,10 +93,16 @@ const handleRefresh = () => {
     })
 
     const tabsSession = sessionStorage.getItem('tabsView')
-    if (tabsSession) {
-      const oldTabs = JSON.parse(tabsSession)
-      if (oldTabs.length > 0) {
-        store.tabList = oldTabs
+    // 检查 tabsSession 存在且不是字符串 "undefined"
+    if (tabsSession && tabsSession !== 'undefined') {
+      try {
+        const oldTabs = JSON.parse(tabsSession)
+        if (oldTabs && Array.isArray(oldTabs) && oldTabs.length > 0) {
+          store.tabList = oldTabs
+        }
+      } catch (error) {
+        console.error('解析 tabs 数据失败:', error)
+        sessionStorage.removeItem('tabsView')
       }
     }
   }
@@ -99,8 +110,10 @@ const handleRefresh = () => {
 
 onMounted(() => {
   handleRefresh()
-  setActiveTab()
-  addTab()
+  nextTick(() => {
+    setActiveTab()
+    addTab()
+  })
 })
 
 // 选项卡点击事件
