@@ -1,23 +1,27 @@
 import type { MenuType } from "@/api/menu/MenuModel";
 import { EditType } from "@/type/BaseEnum";
-import { ref } from "vue";
+import type { FuncList } from "@/type/BaseType";
+import type { Ref } from "vue";
 import useInstance from "@/hooks/useInstance";
 import { deleteApi } from "@/api/menu";
 import { ElMessage } from "element-plus";
-import type { FuncList } from "@/type/BaseType";
 
-export default function useMenu(getList: FuncList) {
+interface UseMenuOptions {
+  addRef?: Ref<any>;
+}
+
+export default function useMenu(getList: FuncList, options?: UseMenuOptions) {
   const { global } = useInstance();
-  const addRef = ref<{ show: (type: string, row?: MenuType) => void }>();
+  const addRef = options?.addRef;
 
   // 新增
   const addBtn = () => {
-    addRef.value?.show(EditType.ADD);
+    addRef?.value?.show(EditType.ADD);
   };
 
   // 编辑
   const editBtn = (row: MenuType) => {
-    addRef.value?.show(EditType.EDIT, row);
+    addRef?.value?.show(EditType.EDIT, row);
   };
 
   // 删除
@@ -36,6 +40,5 @@ export default function useMenu(getList: FuncList) {
     addBtn,
     editBtn,
     deleteBtn,
-    addRef,
   };
 }

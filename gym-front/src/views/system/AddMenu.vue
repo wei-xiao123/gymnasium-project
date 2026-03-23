@@ -94,7 +94,7 @@ import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
 import type { MenuType } from "@/api/menu/MenuModel";
 import type { SelectNode } from "@/api/menu/MenuModel";
-import { nextTick, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import type { FormInstance } from "element-plus";
 import { addApi, editApi } from "@/api/menu";
@@ -106,7 +106,7 @@ const parentRef = ref<{ showParent: () => void }>();
 const addFormRef = ref<FormInstance>();
 
 // 弹框属性
-const { dialog, onClose, onConfirm, onShow } = useDialog();
+const { dialog, onClose, onShow } = useDialog();
 // 弹框显示
 const show = (type: string, row?: MenuType) => {
   dialog.width = 680;

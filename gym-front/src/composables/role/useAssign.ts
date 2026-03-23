@@ -1,4 +1,5 @@
 import { getMenuTreeApi } from "@/api/role"
+import { getListApi } from "@/api/menu"
 import type { AssignParam } from "@/api/role/RoleModel"
 import { reactive } from "vue"
 import { ElMessage } from "element-plus"
@@ -11,9 +12,12 @@ export default function useAssign() {
   })
 
   // 权限树数据
-  const assignTreeData = reactive({
+  const assignTreeData = reactive<{
+    list: any[]
+    assignTreeChecked: number[]
+  }>({
     list: [],
-    assignTreeChecked: [] as number[], // 原来分配的权限ID集合
+    assignTreeChecked: [],
   })
 
   /**
@@ -22,27 +26,49 @@ export default function useAssign() {
    */
   const getMenuTree = async (param: AssignParam) => {
     try {
-      const res = await getMenuTreeApi(param)
-      if (res && res.code === 200) {
-        // 设置权限树数据
-        assignTreeData.list = res.data.listmenu || []
-        // 设置角色原来的权限ID
-        assignTreeData.assignTreeChecked = res.data.checkList || []
-
-        // 数据回显，判断角色原来是否已经分配过权限，如果有，回显
-        if (assignTreeData.assignTreeChecked.length > 0) {
-          const newArr: number[] = []
-          assignTreeData.assignTreeChecked.forEach((item) => {
-            checked(item, assignTreeData.list, newArr)
-          })
-          assignTreeData.assignTreeChecked = newArr
+      // 获取菜单树和已分配的权限
+      const [menuRes, assignRes] = await Promise.all([
+        getListApi(),           // 获取完整菜单树
+        getMenuTreeApi(param)   // 获取已分配权限ID
+      ])
+      
+      console.log("菜单树API返回:", menuRes)
+      console.log("已分配权限API返回:", assignRes)
+      
+      if (menuRes && menuRes.code === 200) {
+        // 处理菜单树数据
+        const menuData = Array.isArray(menuRes.data) ? menuRes.data : (menuRes.data?.list || [])
+        console.log("提取的菜单树数据:", menuData)
+        
+        assignTreeData.list = menuData
+        
+        // 获取已分配的权限
+        if (assignRes && assignRes.code === 200) {
+          const checkList = assignRes.data?.checkList || []
+          console.log("已分配权限:", checkList)
+          
+          assignTreeData.assignTreeChecked = checkList
+          
+          // 数据回显，判断角色原来是否已经分配过权限，如果有，回显
+          if (checkList.length > 0 && menuData.length > 0) {
+            const newArr: number[] = []
+            checkList.forEach((item: number) => {
+              checked(item, menuData, newArr)
+            })
+            assignTreeData.assignTreeChecked = newArr
+          }
         }
+        
+        console.log("最终树数据:", assignTreeData.list)
+        console.log("最终已分配权限:", assignTreeData.assignTreeChecked)
       } else {
-        ElMessage.error(res?.msg || "获取权限树数据失败")
+        ElMessage.error(menuRes?.msg || "获取菜单数据失败")
+        assignTreeData.list = []
       }
     } catch (error) {
       console.error("获取权限树数据错误:", error)
       ElMessage.error("获取权限树数据异常")
+      assignTreeData.list = []
     }
   }
 

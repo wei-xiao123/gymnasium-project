@@ -57,14 +57,18 @@
 <script setup lang="ts">
 import AddMenu from "./AddMenu.vue";
 import { Plus, Edit, Delete } from "@element-plus/icons-vue";
+import { ref } from "vue";
 import useMenu from "@/composables/menu/useMenu";
 import useMenuTable from "@/composables/menu/useMenuTable";
 
 // 表格数据
 const { tableList, refresh, getList } = useMenuTable();
 
+// 创建 ref 引用组件
+const addRef = ref<InstanceType<typeof AddMenu>>();
+
 // 新增、编辑、删除功能
-const { addBtn, editBtn, deleteBtn, addRef } = useMenu(getList);
+const { addBtn, editBtn, deleteBtn } = useMenu(getList, { addRef });
 </script>
 
 <style scoped></style>
