@@ -25,11 +25,6 @@ export const constantRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  {
-    path: "/:pathMatch(.*)*",
-    name: "NotFound",
-    component: () => import("@/views/404/NotFound.vue"),
-  },
 ]
 /* const routes: Array<RouteRecordRaw> = [
   {

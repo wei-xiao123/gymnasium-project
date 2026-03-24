@@ -17,7 +17,7 @@
     </el-form>
 
     <!-- 表格 -->
-    <el-table :data="tableList.list" :height="tableHeight" border stripe>
+    <el-table :data="tableList.list" :height="tableHeight" border stripe row-key="roleId">
       <el-table-column prop="roleName" label="角色名称" />
       <el-table-column prop="remark" label="角色描述" />
       <el-table-column label="操作" width="320" align="center">

@@ -11,11 +11,11 @@
       <el-form-item>
         <el-button @click="searchBtn" :icon="Search">搜索</el-button>
         <el-button @click="resetBtn" type="danger" plain :icon="Close">重置</el-button>
-        <el-button v-permission="['sys:user:add']" type="primary" @click="addBtn":icon="Plus">新增</el-button>
+        <el-button type="primary" @click="addBtn":icon="Plus">新增</el-button>
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableList" border stripe>
+    <el-table :height="tableHeight" :data="tableList" border stripe row-key="userId">
       <el-table-column prop="nickName" label="姓名"></el-table-column>
       <el-table-column prop="username" label="登录账户"></el-table-column>
       <el-table-column prop="sex" label="性别">
@@ -42,11 +42,11 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="320">
         <template #default="scope">
-          <el-button v-permission="['sys:user:edit']" type="primary" :icon="Edit"
+          <el-button type="primary" :icon="Edit"
             size="default" @click="editBtn(scope.row)">编辑</el-button>
-          <el-button v-permission="['sys:user:delete']" type="danger" :icon="Delete"
+          <el-button type="danger" :icon="Delete"
             size="default" @click="deleteBtn(scope.row)">删除</el-button>
-          <el-button v-permission="['sys:user:resetPassword']" type="warning"
+          <el-button type="warning"
             :icon="Edit" size="default" @click="resetPasBtn(scope.row)">重置密码</el-button>
         </template>
       </el-table-column>

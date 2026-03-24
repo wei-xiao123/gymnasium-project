@@ -15,7 +15,7 @@
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableData.list" border stripe>
+    <el-table :height="tableHeight" :data="tableData.list" border stripe row-key="id">
       <el-table-column prop="name" label="器材名称"></el-table-column>
       <el-table-column prop="numTotal" label="器材数量"></el-table-column>
       <el-table-column label="操作" align="center" width="220">

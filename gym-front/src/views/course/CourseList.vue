@@ -16,7 +16,6 @@
         <el-button :icon="Close" @click="resetBtn">重置</el-button>
         <el-button
           :icon="Plus"
-          v-permission="['sys:courseList:add']"
           type="primary"
           @click="addBtn"
         >
@@ -25,7 +24,7 @@
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableDate.list" border stripe>
+    <el-table :height="tableHeight" :data="tableDate.list" border stripe row-key="courseId">
       <el-table-column prop="image" width="90" label="课程封面" align="center">
         <template #default="scope">
           <el-image
@@ -41,7 +40,6 @@
       <el-table-column label="操作" align="center" width="290">
         <template #default="scope">
           <el-button
-            v-permission="['sys:courseList:edit']"
             type="primary"
             :icon="Edit"
             size="default"
@@ -50,7 +48,6 @@
             编辑
           </el-button>
           <el-button
-            v-permission="['sys:courseList:delete']"
             type="danger"
             :icon="Delete"
             size="default"

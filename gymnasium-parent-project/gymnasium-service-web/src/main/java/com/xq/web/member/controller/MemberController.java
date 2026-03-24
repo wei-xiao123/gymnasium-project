@@ -124,4 +124,22 @@ public class MemberController {
         return ResultUtils.success("充值成功");
     }
 
+    @Autowired
+    MemberRechargeService memberRechargeService;
+
+    //我的充值查询
+    @GetMapping("/getMyRecharge")
+    public ResultVo getMyRecharge(RechargeParamList param){
+        //判断是会员还是员工
+        if(param.getUserType().equals("1")){//会员
+            IPage<MemberRecharge> list = memberRechargeService.getRechargeByMember(param);
+            return ResultUtils.success("查询成功",list);
+        }else if(param.getUserType().equals("2")){ //员工
+            IPage<MemberRecharge> list = memberRechargeService.getRechargeList(param);
+            return ResultUtils.success("查询成功",list);
+        }else{
+            return ResultUtils.error("用户类型不存在!");
+        }
+    }
+
 }

@@ -13,7 +13,6 @@
         <el-button :icon="Close" type="danger" plain @click="resetBtn">重置</el-button>
         <el-button
           :icon="Plus"
-          v-permission="['sys:suggestList:add']"
           type="primary"
           @click="addBtn"
         >
@@ -23,13 +22,12 @@
     </el-form>
 
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableData.list" border stripe>
+    <el-table :height="tableHeight" :data="tableData.list" border stripe row-key="id">
       <el-table-column prop="title" label="标题" />
       <el-table-column prop="content" label="内容" />
       <el-table-column label="操作" align="center" width="210">
         <template #default="scope">
           <el-button
-            v-permission="['sys:suggestList:edit']"
             :icon="Edit"
             type="primary"
             size="default"
@@ -38,7 +36,6 @@
             编辑
           </el-button>
           <el-button
-            v-permission="['sys:suggestList:delete']"
             :icon="Delete"
             type="danger"
             size="default"

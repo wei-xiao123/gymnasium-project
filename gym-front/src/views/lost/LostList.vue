@@ -13,7 +13,6 @@
         <el-button :icon="Close" type="danger" plain @click="resetBtn">重置</el-button>
         <el-button
           :icon="Plus"
-          v-permission="['sys:lostList:add']"
           type="primary"
           @click="addBtn"
         >
@@ -23,7 +22,7 @@
     </el-form>
 
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableData.list" border stripe>
+    <el-table :height="tableHeight" :data="tableData.list" border stripe row-key="lostId">
       <el-table-column prop="lostName" label="物品名称" />
       <el-table-column prop="foundPerson" label="捡到人" />
       <el-table-column prop="foundAddres" label="捡到地址" />
@@ -51,7 +50,6 @@
       <el-table-column label="操作" align="center" width="290">
         <template #default="scope">
           <el-button
-            v-permission="['sys:lostList:edit']"
             :icon="Edit"
             type="primary"
             size="default"
@@ -60,7 +58,6 @@
             编辑
           </el-button>
           <el-button
-            v-permission="['sys:lostList:delete']"
             :icon="Delete"
             type="danger"
             size="default"
@@ -69,7 +66,6 @@
             删除
           </el-button>
           <el-button
-            v-permission="['sys:lostList:get']"
             :icon="Edit"
             type="success"
             size="default"

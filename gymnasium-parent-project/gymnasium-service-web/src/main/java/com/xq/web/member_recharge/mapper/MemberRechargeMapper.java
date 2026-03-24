@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xq.web.member_recharge.entity.MemberRecharge;
 import org.apache.ibatis.annotations.Param;
 
+
 public interface MemberRechargeMapper extends BaseMapper<MemberRecharge> {
 
     IPage<MemberRecharge> getRechargeList(IPage<MemberRecharge> page);

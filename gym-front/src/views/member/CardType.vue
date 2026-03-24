@@ -11,7 +11,6 @@
           重置
         </el-button>
         <el-button
-          v-permission="['sys:memberRoot:add']"
           :icon="Plus"
           type="primary"
           @click="addBtn"
@@ -21,7 +20,7 @@
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableList.list" border stripe>
+    <el-table :height="tableHeight" :data="tableList.list" border stripe row-key="cardId">
       <el-table-column prop="title" label="标题"></el-table-column>
       <el-table-column prop="cardType" label="类型">
         <template #default="scope">
@@ -52,7 +51,6 @@
       <el-table-column label="操作" align="center" width="220">
         <template #default="scope">
           <el-button
-            v-permission="['sys:memberRoot:edit']"
             type="primary"
             :icon="Edit"
             size="default"
@@ -61,7 +59,6 @@
             编辑
           </el-button>
           <el-button
-            v-permission="['sys:memberRoot:delete']"
             type="danger"
             :icon="Delete"
             size="default"

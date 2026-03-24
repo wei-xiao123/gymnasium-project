@@ -23,7 +23,7 @@
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableList.list" border stripe>
+    <el-table :height="tableHeight" :data="tableList.list" border stripe row-key="memberId">
       <el-table-column
         prop="username"
         width="150"

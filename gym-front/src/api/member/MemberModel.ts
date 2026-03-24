@@ -40,3 +40,11 @@ export type Recharge = {
   money: number;
   userId: string;
 };
+
+export type MemberRecharge = {
+  currentPage:number,
+  pageSize:number,
+  total:number,
+  memberId:string,
+  userType:string
+};

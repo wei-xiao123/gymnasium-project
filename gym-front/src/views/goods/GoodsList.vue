@@ -10,7 +10,6 @@
 				<el-button :icon="Search" @click="searchBtn">搜索</el-button>
 				<el-button :icon="Close" plain type="danger" @click="resetBtn">重置</el-button>
 				<el-button
-					v-permission="['sys:goodsList:add']"
 					:icon="Plus"
 					type="primary"
 					@click="addBtn"
@@ -21,7 +20,7 @@
 		</el-form>
 
 		<!-- 表格 -->
-		<el-table :data="tableData.list" :height="tableHeight" border stripe>
+		<el-table :data="tableData.list" :height="tableHeight" border stripe row-key="goodsId">
 			<el-table-column align="center" label="商品图片" prop="image" width="90">
 				<template #default="scope">
 					<el-image
@@ -38,7 +37,6 @@
 			<el-table-column align="center" label="操作" width="220">
 				<template #default="scope">
 					<el-button
-						v-permission="['sys:goodsList:edit']"
 						:icon="Edit"
 						size="default"
 						type="primary"
@@ -47,7 +45,6 @@
 						编辑
 					</el-button>
 					<el-button
-						v-permission="['sys:goodsList:delete']"
 						:icon="Delete"
 						size="default"
 						type="danger"
