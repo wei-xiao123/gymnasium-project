@@ -30,10 +30,11 @@
 
       <el-table-column prop="icon" label="图标">
         <template #default="scope">
-          <el-icon>
+          <el-icon v-if="getIconComponent(scope.row.icon)">
             <!-- 动态组件显示图标 -->
-            <component :is="scope.row.icon"></component>
+            <component :is="getIconComponent(scope.row.icon)"></component>
           </el-icon>
+          <span v-else>-</span>
         </template>
       </el-table-column>
 
@@ -60,6 +61,7 @@ import { Plus, Edit, Delete } from "@element-plus/icons-vue";
 import { ref } from "vue";
 import useMenu from "@/composables/menu/useMenu";
 import useMenuTable from "@/composables/menu/useMenuTable";
+import * as ElIcons from "@element-plus/icons-vue";
 
 // 表格数据
 const { tableList, refresh, getList } = useMenuTable();
@@ -69,6 +71,12 @@ const addRef = ref<InstanceType<typeof AddMenu>>();
 
 // 新增、编辑、删除功能
 const { addBtn, editBtn, deleteBtn } = useMenu(getList, { addRef });
+
+// 动态获取图标组件
+const getIconComponent = (iconName: string) => {
+  if (!iconName) return null;
+  return (ElIcons as any)[iconName] || null;
+};
 </script>
 
 <style scoped></style>

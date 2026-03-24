@@ -35,11 +35,11 @@ class Http {
     this.instance.interceptors.request.use(
       (config) => {
         // 在请求头部携带 token
-        const token = userStore().getToken();
+        const token = userStore().getToken()
         if (token) {
-          config.headers["token"] = token;
+          config.headers["token"] = token
         }
-        return config;
+        return config
       },
       (error: any) => {
         error.data = {};

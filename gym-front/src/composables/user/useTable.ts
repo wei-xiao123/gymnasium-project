@@ -21,12 +21,18 @@ export default function useTable() {
   // 获取列表数据
   const getList = async () => {
     try {
+      console.log("调用 getListApi，参数:", listParam)
       const res = await getListApi(listParam);
+      console.log("getListApi 响应:", res)
       if (res && res.code === 200) {
         // 设置表格的数据
         tableList.value = res.data?.records || [];
         // 设置分页的总条数
         listParam.total = res.data?.total || 0;
+        console.log("表格数据:", tableList.value)
+      } else {
+        console.error("API 返回错误:", res?.msg)
+        tableList.value = [];
       }
     } catch (error) {
       console.error("获取列表失败:", error);

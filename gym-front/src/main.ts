@@ -9,6 +9,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import objCopy from './utils/objCopy'
 import myconfirm from './utils/myconfirm'
 import permissionDirective from '@/directives/permission'
+import './permission'
 
 // 实例化 Pinia
 const pinia = createPinia()

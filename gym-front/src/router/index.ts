@@ -1,9 +1,37 @@
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import Layout from "@/layout/Index.vue"
-import { userStore } from "@/store/user"
 
-const routes: Array<RouteRecordRaw> = [
+// 只包含公开路由（不需要权限验证）
+export const constantRoutes: Array<RouteRecordRaw> = [
+  {
+    path: "/login",
+    component: () => import("@/views/login/Login.vue"),
+    name: "login",
+  },
+  {
+    path: "/",
+    component: Layout,
+    redirect: "/dashboard",
+    children: [
+      {
+        path: "/dashboard",
+        component: () => import("@/layout/dashboard/Index.vue"),
+        name: "dashboard",
+        meta: {
+          title: "首页",
+          icon: "#icondashboard",
+        },
+      },
+    ],
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/404/NotFound.vue"),
+  },
+]
+/* const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     component: () => import("@/views/login/Login.vue"),
@@ -36,7 +64,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "userList",
+        path: "/userList",
         component: () => import("@/views/system/UserList.vue"),
         name: "userList",
         meta: {
@@ -46,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "roleList",
+        path: "/roleList",
         component: () => import("@/views/system/RoleList.vue"),
         name: "roleList",
         meta: {
@@ -56,7 +84,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "menuList",
+        path: "/menuList",
         component: () => import("@/views/system/MenuList.vue"),
         name: "menuList",
         meta: {
@@ -78,7 +106,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "cardType",
+        path: "/cardType",
         component: () => import("@/views/member/CardType.vue"),
         name: "cardType",
         meta: {
@@ -88,7 +116,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "memberList",
+        path: "/memberList",
         component: () => import("@/views/member/MemberList.vue"),
         name: "memberList",
         meta: {
@@ -98,7 +126,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "myFee",
+        path: "/myFee",
         component: () => import("@/views/member/MyFee.vue"),
         name: "myFee",
         meta: {
@@ -120,7 +148,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "courseList",
+        path: "/courseList",
         component: () => import("@/views/course/CourseList.vue"),
         name: "courseList",
         meta: {
@@ -130,8 +158,8 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "mycourse",
-        component: () => import("@/views/mycourse/MyCourse.vue"),
+        path: "/mycourse",
+        component: () => import("@/views/mycourse/mycourse.vue"),
         name: "mycourse",
         meta: {
           title: "我的课程",
@@ -152,7 +180,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "materialList",
+        path: "/materialList",
         component: () => import("@/views/material/MaterialList.vue"),
         name: "materialList",
         meta: {
@@ -174,7 +202,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "goodsList",
+        path: "/goodsList",
         component: () => import("@/views/goods/GoodsList.vue"),
         name: "goodsList",
         meta: {
@@ -196,7 +224,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "lostList",
+        path: "/lostList",
         component: () => import("@/views/lost/LostList.vue"),
         name: "lostList",
         meta: {
@@ -218,7 +246,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     children: [
       {
-        path: "suggestList",
+        path: "/suggestList",
         component: () => import("@/views/suggest/SuggestList.vue"),
         name: "suggestList",
         meta: {
@@ -229,34 +257,10 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-];
-
+] */
 const router = createRouter({
   history: createWebHistory(),
-  routes,
-})
-
-// 路由守卫 - 检查用户是否已登录
-router.beforeEach((to, _from, next) => {
-  const user = userStore()
-
-  // 如果是登录页面，直接进入
-  if (to.path === "/login") {
-    next()
-    return
-  }
-
-  // 获取 token
-  const token = user.getToken()
-
-  // 如果访问其他页面但未登录，重定向到登录页
-  if (!token || token === '') {
-    next("/login")
-    return
-  }
-
-  // 已登录，正常进入
-  next()
+  routes: constantRoutes,
 })
 
 export default router

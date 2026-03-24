@@ -5,3 +5,8 @@ export type LoginParam = {
     code:string,
     userType:string
 }
+
+export type InfoParam = {
+    userId:string,
+    userType:string
+}

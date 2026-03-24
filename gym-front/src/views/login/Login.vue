@@ -23,6 +23,8 @@
         <el-input
           size="large"
           v-model="loginModel.password"
+          type="password"
+          show-password
           placeholder="请输入密码"
         />
       </el-form-item>
@@ -79,8 +81,10 @@ import useImage from "@/composables/login/useImage"
 import { loginApi } from "@/api/login/index"
 import { useRouter } from "vue-router"
 import { userStore } from "@/store/user"
+import { menuStore } from "@/store/menu"
 
 const store = userStore()
+const mstore = menuStore()
 const router = useRouter()
 const { imgSrc, getImage } = useImage()
 
@@ -107,9 +111,13 @@ const onSubmit = async () => {
     const res = await loginApi(loginModel)
     // 业务成功
     if (res && res.code === 200) {
+      // 清除旧的菜单缓存，确保新用户能加载新的权限菜单
+      mstore.menuList = []
+
       // 保存登录信息
       store.setToken(res.data.token)
       store.setUserId(res.data.userId)
+      store.setUserType(loginModel.userType)
 
       ElMessage.success("登录成功")
 
@@ -160,9 +168,9 @@ const onSubmit = async () => {
     .image {
       height: 40px;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      cursor: pointer;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
     }
   }
 }

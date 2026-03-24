@@ -35,9 +35,10 @@ import Tabs from './tabs/Tabs.vue'
     background-color: #304156;
   }
 
-  .header {
+.header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     background-color: #009688;
   }
 

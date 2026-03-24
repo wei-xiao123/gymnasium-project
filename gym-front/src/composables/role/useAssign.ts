@@ -29,26 +29,23 @@ export default function useAssign() {
       // 获取菜单树和已分配的权限
       const [menuRes, assignRes] = await Promise.all([
         getListApi(),           // 获取完整菜单树
-        getMenuTreeApi(param)   // 获取已分配权限ID
+        getMenuTreeApi(param),  // 获取已分配权限ID
       ])
-      
-      console.log("菜单树API返回:", menuRes)
-      console.log("已分配权限API返回:", assignRes)
-      
+
       if (menuRes && menuRes.code === 200) {
         // 处理菜单树数据
-        const menuData = Array.isArray(menuRes.data) ? menuRes.data : (menuRes.data?.list || [])
-        console.log("提取的菜单树数据:", menuData)
-        
+        const menuData = Array.isArray(menuRes.data)
+          ? menuRes.data
+          : menuRes.data?.list || []
+
         assignTreeData.list = menuData
-        
+
         // 获取已分配的权限
         if (assignRes && assignRes.code === 200) {
           const checkList = assignRes.data?.checkList || []
-          console.log("已分配权限:", checkList)
-          
+
           assignTreeData.assignTreeChecked = checkList
-          
+
           // 数据回显，判断角色原来是否已经分配过权限，如果有，回显
           if (checkList.length > 0 && menuData.length > 0) {
             const newArr: number[] = []
@@ -58,9 +55,6 @@ export default function useAssign() {
             assignTreeData.assignTreeChecked = newArr
           }
         }
-        
-        console.log("最终树数据:", assignTreeData.list)
-        console.log("最终已分配权限:", assignTreeData.assignTreeChecked)
       } else {
         ElMessage.error(menuRes?.msg || "获取菜单数据失败")
         assignTreeData.list = []
