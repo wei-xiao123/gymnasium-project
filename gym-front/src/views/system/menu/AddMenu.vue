@@ -9,30 +9,26 @@
   >
     <template v-slot:content>
       <el-form
-        ref="addFormRef"
         :model="addModel"
+        ref="addFormRef"
         :rules="rules"
         label-width="80px"
         size="default"
       >
         <el-form-item prop="type" label="菜单类型">
           <el-radio-group v-model="addModel.type">
-            <el-radio :value="'0'">目录</el-radio>
-            <el-radio :value="'1'">菜单</el-radio>
-            <el-radio :value="'2'">按钮</el-radio>
+            <el-radio :label="'0'">目录</el-radio>
+            <el-radio :label="'1'">菜单</el-radio>
+            <el-radio :label="'2'">按钮</el-radio>
           </el-radio-group>
         </el-form-item>
-
         <el-row>
           <el-col :span="12" :offset="0">
             <el-form-item label="上级菜单" prop="parentName">
+              <el-input type="hidden" v-model="addModel.parentId"></el-input>
               <el-input
-                type="hidden"
-                v-model="addModel.parentId"
-              ></el-input>
-              <el-input
-                readonly
                 @click="selectOpen"
+                readonly
                 v-model="addModel.parentName"
               ></el-input>
             </el-form-item>
@@ -43,7 +39,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row v-if="addModel.type != '2'">
           <el-col :span="12" :offset="0">
             <el-form-item label="菜单图标" prop="icon">
@@ -56,7 +51,6 @@
             </el-form-item>
           </el-col>
         </el-row>
-
         <el-row>
           <el-col :span="12" :offset="0">
             <el-form-item label="菜单序号" prop="orderNum">
@@ -84,63 +78,47 @@
       </el-form>
     </template>
   </SysDialog>
-
-  <!-- 上级菜单弹框 -->
+  <!-- 上级菜单 -->
   <ParentMenu ref="parentRef" @selectParent="selectParent"></ParentMenu>
 </template>
+
 <script setup lang="ts">
 import ParentMenu from "./ParentMenu.vue";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import type { MenuType } from "@/api/menu/MenuModel";
-import type { SelectNode } from "@/api/menu/MenuModel";
-import { reactive, ref } from "vue";
-import { ElMessage } from "element-plus";
-import type { FormInstance } from "element-plus";
-import { addApi, editApi } from "@/api/menu";
+import type { MenuType, SelectNode } from "@/api/menu/MenuModel";
+import { nextTick, reactive, ref } from "vue";
+import { ElMessage,type FormInstance } from "element-plus";
+import { addApi,editApi } from "@/api/menu";
 import { EditType, Title } from "@/type/BaseEnum";
 import useInstance from "@/hooks/useInstance";
-
 const { global } = useInstance();
 const parentRef = ref<{ showParent: () => void }>();
 const addFormRef = ref<FormInstance>();
-
-// 弹框属性
-const { dialog, onClose, onShow } = useDialog();
-// 弹框显示
+//弹框属性
+const { dialog, onClose, onConfirm, onShow } = useDialog();
+//弹框显示
 const show = (type: string, row?: MenuType) => {
   dialog.width = 680;
   type == EditType.ADD
     ? (dialog.title = Title.ADD)
     : (dialog.title = Title.EDIT);
-
-  addModel.editType = type;
-
-  // 新增模式：清空表单
-  if (type == EditType.ADD) {
-    // 重置表单数据和验证
-    Object.keys(addModel).forEach((key) => {
-      if (key === "open" || key === "editType") return;
-      (addModel as any)[key] = "";
+  if (type == EditType.EDIT) {
+    //把要编辑的数据设置到表单绑定的对象里面
+    nextTick(() => {
+      global.$objCopy(row, addModel);
     });
-    addModel.open = true;
-    addModel.editType = type;
-    addFormRef.value?.clearValidate();
-  } else if (type == EditType.EDIT && row) {
-    // 编辑模式：复制数据到表单
-    global.$objCopy(row, addModel);
-    addFormRef.value?.clearValidate();
   }
-
   onShow();
+  //清空表单
+  addFormRef.value?.resetFields();
+  addModel.editType = type;
 };
-
-// 暴露给父组件调用
+//暴露出去，给父组件调用
 defineExpose({
   show,
 });
-
-// 表单绑定的数据
+//表单绑定的数据
 const addModel = reactive<MenuType>({
   editType: "",
   menuId: "",
@@ -156,8 +134,7 @@ const addModel = reactive<MenuType>({
   orderNum: "",
   open: true,
 });
-
-// 表单验证规则
+//表单验证规则
 const rules = reactive({
   parentName: [
     {
@@ -209,35 +186,32 @@ const rules = reactive({
     },
   ],
 });
-// 注册事件
+//注册事件
 const emits = defineEmits(["refresh"]);
-
-// 表单提交
+//表单提交
 const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null;
+      let res: any;
       if (addModel.editType == EditType.ADD) {
         res = await addApi(addModel);
-      } else {
-        res = await editApi(addModel);
+      }else{
+        res = await editApi(addModel)
       }
       if (res && res.code == 200) {
         ElMessage.success(res.msg);
-        // 刷新表格
+        //刷新表格
         emits("refresh");
         onClose();
       }
     }
   });
 };
-
-// 选择上级菜单事件
+//选择上级菜单事件
 const selectOpen = () => {
   parentRef.value?.showParent();
 };
-
-// 选择回调
+//选择回调
 const selectParent = (node: SelectNode) => {
   addModel.parentId = node.parentId;
   addModel.parentName = node.parentName;

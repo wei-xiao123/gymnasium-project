@@ -1,5 +1,6 @@
-import http from "@/http";
-import type { LostParam, LostType } from "./LostModel";
+import http from '@/http'
+import type{ LostType,LostParam } from './LostModel'
+
 //新增
 export const addApi = (param:LostType)=>{
     return http.post('/api/lost',param)
@@ -10,7 +11,7 @@ export const getListApi = (param:LostParam)=>{
 }
 //编辑
 export const editApi = (param:LostType)=>{
-    return http.put('/api/lost',param)
+    return http.put("/api/lost",param)
 }
 //删除
 export const deleteApi = (lostId:string)=>{

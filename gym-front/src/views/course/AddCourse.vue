@@ -16,58 +16,59 @@
         size="default"
       >
         <el-row>
-          <el-col :span="12">
+          <el-col :span="12" :offset="0">
             <el-form-item prop="courseName" label="课程名称">
-              <el-input v-model="addModel.courseName" />
+              <el-input v-model="addModel.courseName"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="12" :offset="0">
             <el-form-item prop="courseHour" label="课程课时">
-              <el-input v-model="addModel.courseHour" />
+              <el-input v-model="addModel.courseHour"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="12" :offset="0">
             <el-form-item prop="coursePrice" label="课程价格">
-              <el-input v-model="addModel.coursePrice" />
+              <el-input v-model="addModel.coursePrice"></el-input>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="12" :offset="0">
             <el-form-item prop="teacherName" label="教练">
               <el-select
-                v-model="addModel.teacherName"
                 style="width: 100%"
+                v-model="addModel.teacherName"
                 class="m-2"
                 placeholder="请选择教练"
                 size="default"
+                @change="selectTeach"
               >
                 <el-option
                   v-for="item in teacherData.list"
                   :key="item.label"
                   :label="item.label"
-                  :value="item.label"
+                  :value="{value:item.value,label:item.label}"
                 />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="课程封面">
+        <el-form-item prop="image" label="课程图片">
           <el-upload
             ref="uploadRef"
             action="#"
             :on-change="uploadFile"
-            :auto-upload="false"
-            :limit="1"
-            :file-list="fileList"
             list-type="picture-card"
+            :auto-upload="false"
+            :file-list="fileList"
+            :limit="1"
           >
             <el-icon><Plus /></el-icon>
+
             <template #file="{ file }">
               <div>
                 <img
                   class="el-upload-list__item-thumbnail"
-                  ref="imageSrc"
                   :src="file.url"
                   alt=""
                 />
@@ -89,12 +90,13 @@
               </div>
             </template>
           </el-upload>
+
           <el-dialog v-model="dialogVisible">
             <img w-full :src="dialogImageUrl" alt="Preview Image" />
           </el-dialog>
         </el-form-item>
         <el-form-item prop="courseDetails" label="课程详情">
-          <div style="border: 1px solid #ccc; position: relative; z-index: 1;">
+          <div style="border: 1px solid #ccc">
             <Toolbar
               style="border-bottom: 1px solid #ccc"
               :editor="editorRef"
@@ -102,8 +104,8 @@
               :mode="mode"
             />
             <Editor
+              style="height: 300px; overflow-y: hidden"
               v-model="valueHtml"
-              style="height: 300px; overflow-y: hidden;"
               :defaultConfig="editorConfig"
               :mode="mode"
               @onCreated="handleCreated"
@@ -116,14 +118,12 @@
 </template>
 
 <script setup lang="ts">
-import "@wangeditor/editor/dist/css/style.css";
-import { Delete, Plus, ZoomIn } from "@element-plus/icons-vue";
-// @ts-ignore
+import "@wangeditor/editor/dist/css/style.css"; // 引入 css
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
-import type { CourseType } from "@/api/course/CourseModel";
+import {type CourseType } from "@/api/course/CourseModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { ElMessage, type FormInstance, type UploadFile } from "element-plus";
+import { ElMessage,type FormInstance } from "element-plus";
 import { nextTick, reactive, ref } from "vue";
 import useUpload from "@/composables/course/useUpload";
 import useEditor from "@/composables/course/useEditor";
@@ -131,215 +131,179 @@ import useSelectTeacher from "@/composables/course/useSelectTeacher";
 import { EditType, Title } from "@/type/BaseEnum";
 import { addApi, editApi } from "@/api/course/index";
 import useInstance from "@/hooks/useInstance";
-
 const { global } = useInstance();
-
-// 表单的 ref 属性
+//表单的ref属性
 const addFormRef = ref<FormInstance>();
-
-// 弹框属性
-const { dialog, onClose, onShow } = useDialog();
-
-// 教练选择
+//弹框属性
+const { dialog, onClose, onShow, onConfirm } = useDialog();
+//教练选择
 const { teacherData, listTeacher } = useSelectTeacher();
-
-// 图片上传
+//图片上传
 const {
-  uploadRef,
   dialogImageUrl,
   dialogVisible,
   disabled,
   handleRemove,
   handlePictureCardPreview,
-  fileList,
   uploadFile,
-  imgurl
+  uploadRef,
+  imgurl,
+  fileList,
 } = useUpload();
-
-// 文本编辑器
+//文本编辑器
 const {
   editorRef,
   handleCreated,
   mode,
   editorConfig,
   valueHtml,
-  toolbarConfig
+  toolbarConfig,
 } = useEditor();
-
-// 显示弹框
-type CourseForm = Omit<CourseType, "courseHour" | "coursePrice"> & {
-  courseHour: number | null;
-  coursePrice: number | null;
-};
-
-const resetAddModel = () => {
-  addModel.type = "";
-  addModel.courseId = "";
-  addModel.courseName = "";
-  addModel.image = "";
-  addModel.teacherName = "";
-  addModel.courseHour = null;
-  addModel.courseDetails = "";
-  addModel.coursePrice = null;
-};
-
+//显示弹框
 const show = async (type: string, row?: CourseType) => {
-  dialog.title = type === EditType.ADD ? Title.ADD : Title.EDIT;
+  //清空图片数据
+  fileList.value = [];
+  //获取教练数据列表
+  await listTeacher();
+  //弹框属性
+  type == EditType.ADD
+    ? (dialog.title = Title.ADD)
+    : (dialog.title = Title.EDIT);
   dialog.width = 900;
   dialog.height = 500;
-
-  await listTeacher();
-
+  //清空图片和文本编辑器
   const upload = uploadRef.value;
   if (upload) {
     upload.clearFiles();
   }
-
-  fileList.value = [];
-  imgurl.value = "";
-
-  if (type === EditType.ADD) {
-    resetAddModel();
-    valueHtml.value = "";
+  addModel.image = "";
+  if (type == EditType.ADD) {
     const editor = editorRef.value;
     if (editor) {
       editor.clear();
     }
-    addFormRef.value?.clearValidate();
   }
-
-  if (type === EditType.EDIT) {
+  addModel.courseDetails = "";
+  //编辑数据回显
+  if (type == EditType.EDIT) {
     nextTick(() => {
-      global.$objCopy(row, addModel as CourseType);
-
+      //把要编辑的数据复制到表单绑定的对象
+      global.$objCopy(row, addModel);
+      //文本编辑器的回显
+      valueHtml.value = addModel.courseDetails;
+      //图片回显
       if (row?.image) {
-        const obj: UploadFile = {
-          name: "image",
-          url: row.image,
-          status: "success",
-          uid: Date.now(),
-        };
-        fileList.value.push(obj);
-        imgurl.value = row.image;
+        //图片回显
+        let img = {
+          name: "",
+          url: "",
+        } as any;
+        imgurl.value = addModel.image;
+        img.url = addModel.image;
+        fileList.value.push(img);
       }
-
-      // 用 setTimeout 确保编辑器完全渲染后再设置内容
-      setTimeout(() => {
-        valueHtml.value = row?.courseDetails ?? "";
-        const editor = editorRef.value;
-        if (editor && typeof editor.focus === 'function') {
-          editor.focus();
-        }
-      }, 100);
-
-      addFormRef.value?.clearValidate();
     });
   }
-
+  if (row && row.courseDetails) {
+    //文本编辑器的回显
+    valueHtml.value = row.courseDetails;
+  }
   onShow();
+  //表单清空
+  addFormRef.value?.resetFields();
   addModel.type = type;
 };
-
-// 暴露出去，给外部组件使用
+//暴露出去，给外部组件使用
 defineExpose({
-  show
+  show,
 });
-
-// 表单绑定的数据对象
-const addModel = reactive<CourseForm>({
-  type: "", // 区分新增/编辑
+//表单绑定的数据对象
+const addModel = reactive<CourseType>({
+  type: "", //区分 新增 编辑
   courseId: "",
   courseName: "",
   image: "",
   teacherName: "",
-  courseHour: null,
+  teacherId: "",
+  courseHour: 0,
   courseDetails: "",
-  coursePrice: null,
+  coursePrice: 0,
 });
-
-const validateCourseHour = (_rule: any, value: any, callback: any) => {
-  if (value == null || Number(value) <= 0) {
+const validateCourseHour = (rule: any, value: any, callback: any) => {
+  if (value === 0 || value < 0) {
     callback(new Error("请填写课程课时"));
   } else {
     callback();
   }
 };
-
-const validateCoursePrice = (_rule: any, value: any, callback: any) => {
-  if (value == null || Number(value) <= 0) {
+const validateCoursePrice = (rule: any, value: any, callback: any) => {
+  if (value === 0 || value < 0) {
     callback(new Error("请填写课程价格"));
   } else {
     callback();
   }
 };
-
-// 表单验证规则
+//表单验证规则
 const rules = reactive({
   courseName: [
     {
       required: true,
       trigger: "blur",
-      message: "请输入课程名称"
-    }
+      message: "请输入课程名称",
+    },
   ],
   image: [
     {
       required: true,
       trigger: "blur",
-      message: "请上传课程图片"
-    }
+      message: "请上传课程图片",
+    },
   ],
   teacherName: [
     {
       required: true,
       trigger: "blur",
-      message: "请选择课程教练"
-    }
+      message: "请选择课程教练",
+    },
   ],
   courseDetails: [
     {
       required: true,
       trigger: "blur",
-      message: "请填写课程详情"
-    }
+      message: "请填写课程详情",
+    },
   ],
   coursePrice: [
     {
       required: true,
       validator: validateCoursePrice,
-      trigger: "blur"
-    }
+      trigger: "blur",
+    },
   ],
   courseHour: [
     {
       required: true,
       validator: validateCourseHour,
-      trigger: "blur"
-    }
-  ]
+      trigger: "blur",
+    },
+  ],
 });
-
-// 注册事件
-const emits = defineEmits<{
-  reFresh: [];
-}>();
-
-// 表单提交
+//注册事件
+const emits = defineEmits(["reFresh"]);
+//表单提交
 const commit = () => {
-  // 课程图片地址
+  //封面图地址
   addModel.image = imgurl.value;
-  // 课程详情
+  //课程详情
   addModel.courseDetails = valueHtml.value;
-  // 转换课时和价格为数字
-  addModel.courseHour = Number(addModel.courseHour);
-  addModel.coursePrice = Number(addModel.coursePrice);
-  
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      const res = addModel.type == EditType.ADD
-        ? await addApi(addModel as CourseType)
-        : await editApi(addModel as CourseType);
-        
+      let res: any;
+      if (addModel.type == EditType.ADD) {
+        res = await addApi(addModel);
+      } else {
+        res = await editApi(addModel);
+      }
       if (res && res.code == 200) {
         ElMessage.success(res.msg);
         emits("reFresh");
@@ -348,6 +312,12 @@ const commit = () => {
     }
   });
 };
+//选择教练的change
+const selectTeach = (val:any)=>{
+  console.log('obj:',val)
+  addModel.teacherId = val.value;
+  addModel.teacherName = val.label;
+}
 </script>
 
 <style scoped></style>

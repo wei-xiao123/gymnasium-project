@@ -1,4 +1,4 @@
-//登录参数类型
+//登录参数的数据类型
 export type LoginParam = {
     username:string,
     password:string,

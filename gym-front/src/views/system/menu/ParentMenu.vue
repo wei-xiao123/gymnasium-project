@@ -12,13 +12,15 @@
         ref="parentTree"
         :data="treeData.list"
         node-key="menuId"
-        default-expand-all
         :props="defaultProps"
-        :highlight-current="true"
+        empty-text="暂无数据"
+        default-expand-all
+        :show-checkbox="false"
         :expand-on-click-node="false"
+        :highlight-current="true"
         @node-click="handleNodeClick"
       >
-        <template #default="{ node, data }">
+      <template #default="{ node, data }">
           <div class="custom-tree-container">
             <!-- 长度为0说明没有下级 -->
             <span v-if="data.children.length == 0">
@@ -50,119 +52,99 @@
     </template>
   </SysDialog>
 </template>
+
 <script setup lang="ts">
-import { DocumentRemove, Plus, Minus } from "@element-plus/icons-vue";
+import {DocumentRemove,Plus,Minus} from '@element-plus/icons-vue'
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
 import { getParentApi } from "@/api/menu";
-import { reactive, ref } from "vue";
-import type { MenuType } from "@/api/menu/MenuModel";
-import type { SelectNode } from "@/api/menu/MenuModel";
-import { ElTree } from "element-plus";
-
-// 树的 ref 属性
+import { reactive ,ref} from "vue";
+import type{ MenuType,SelectNode } from "@/api/menu/MenuModel";
+import { ElTree } from 'element-plus';
+//树的ref属性
 const parentTree = ref<InstanceType<typeof ElTree>>();
-
-// 树属性配置
+//树选择的数据
+const selectNode = reactive<SelectNode>({
+    parentId:'',
+    parentName:''
+})
+//树属性配置
 const defaultProps = {
-  children: "children",
-  label: "title",
-};
-
-// 上级树数据
+  children: 'children',
+  label: 'title',
+}
+//树的数据
 const treeData = reactive({
   list: [],
 });
-
-// 选中数据
-const selectNode = reactive<SelectNode>({
-  parentId: "",
-  parentName: "",
-});
-
-// 弹框属性
-const { dialog, onClose, onShow } = useDialog();
-
-// 显示弹框
+//弹框属性
+const { dialog, onClose, onConfirm, onShow } = useDialog();
+//显示弹框
 const showParent = async () => {
-  // 查询树数据
+  //查询数据
   await getParent();
-  dialog.title = "";
-  dialog.width = 300;
   dialog.height = 450;
+  dialog.width = 300;
+  dialog.title = "选择上级菜单";
   onShow();
 };
-
-// 暴露给父组件调用
+//暴露出去，给父组件调用
 defineExpose({
   showParent,
 });
-
-// 查询上级菜单数据
+//获取树数据
 const getParent = async () => {
-  const res = await getParentApi();
+  let res = await getParentApi();
   if (res && res.code == 200) {
     treeData.list = res.data;
   }
 };
-
-// 树点击事件
-const handleNodeClick = (node: MenuType) => {
-  console.log(node);
-  selectNode.parentId = node.menuId;
-  selectNode.parentName = node.title;
-};
-
-// 注册事件
-const emits = defineEmits(["selectParent"]);
-
-// 弹框确定
-const confirm = () => {
-  emits("selectParent", selectNode);
-  onClose();
-};
-
-// 加号和减号的点击事件
+//树节点点击事件
+const handleNodeClick = (node:MenuType)=>{
+    console.log(node)
+    selectNode.parentId = node.menuId;
+    selectNode.parentName = node.title
+}
+//注册事件
+const emits = defineEmits(['selectParent'])
+//选择树提交
+const confirm = ()=>{
+    emits('selectParent',selectNode)
+    onClose()
+}
+//加号和减号的点击事件
 const openBtn = (data: MenuType) => {
   console.log(data);
-  // 设置展开或者关闭
+  //设置展开或者关闭
   data.open = !data.open;
-
-  if (parentTree.value && parentTree.value.store) {
-    const node = parentTree.value.store.nodesMap[data.menuId];
-    if (node) {
-      node.expanded = data.open;
-    }
+  if (parentTree.value) {
+    parentTree.value.store.nodesMap[data.menuId].expanded = !data.open;
   }
 };
 </script>
+
 <style lang="scss">
 .el-tree {
-  // 将每一行的设置为相对定位 方便后面 before after 使用绝对定位来固定位置
+  // 将每一行的设置为相对定位 方便后面before after 使用绝对定位来固定位置
   .el-tree-node {
     position: relative;
     padding-left: 10px;
   }
-
   // 子集像右偏移 给数线留出距离
   .el-tree-node__children {
     padding-left: 20px;
   }
-
-  // 这是竖线
+  //这是竖线
   .el-tree-node :last-child:before {
     height: 40px;
   }
-
   .el-tree > .el-tree-node:before {
     border-left: none;
   }
-
   .el-tree > .el-tree-node:after {
     border-top: none;
   }
-
-  // 这自定义的线的公共部分
+  //这自定义的线 的公共部分
   .el-tree-node:before,
   .el-tree-node:after {
     content: "";
@@ -171,11 +153,9 @@ const openBtn = (data: MenuType) => {
     right: auto;
     border-width: 1px;
   }
-
   .tree :first-child .el-tree-node:before {
     border-left: none;
   }
-
   // 竖线
   .el-tree-node:before {
     border-left: 1px dotted #d9d9d9;
@@ -184,38 +164,32 @@ const openBtn = (data: MenuType) => {
     top: -25px;
     width: 1px;
   }
-
-  // 横线
+  //横线
   .el-tree-node:after {
     border-top: 1px dotted #d9d9d9;
     height: 20px;
     top: 14px;
     width: 24px;
   }
-
   .el-tree-node__expand-icon.is-leaf {
     width: 8px;
   }
-
-  // 去掉 element-ui 自带的展开按钮 一个向下的按钮,打开时向右
+  //去掉elementui自带的展开按钮  一个向下的按钮,打开时向右
   .el-tree-node__content > .el-tree-node__expand-icon {
     display: none;
   }
-
-  // 每一行的高度
+  //每一行的高度
   .el-tree-node__content {
     line-height: 30px;
     height: 30px;
     padding-left: 10px !important;
   }
 }
-
-// 去掉最上级的 before after 即是去掉最上层的连接线
+//去掉最上级的before  after 即是去电最上层的连接线
 .el-tree > div {
   &::before {
     display: none;
   }
-
   &::after {
     display: none;
   }

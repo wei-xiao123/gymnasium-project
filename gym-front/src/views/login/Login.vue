@@ -1,72 +1,73 @@
 <template>
   <div class="logincontainer">
     <el-form
-      class="loginForm"
       :model="loginModel"
-      ref="loginForm"
+      class="loginform"
+      ref="loginRef"
       :rules="rules"
       size="default"
     >
-      <el-form-item class="form-item-center">
-        <div class="loginTitle">系统登录</div>
-      </el-form-item>
-
       <el-form-item>
+        <div class="logintitle">系统登录</div>
+      </el-form-item>
+      <el-form-item prop="username">
         <el-input
           size="large"
           v-model="loginModel.username"
-          placeholder="请输入账号"
-        />
+          placeholder="请输入账户"
+        ></el-input>
       </el-form-item>
-
-      <el-form-item>
+      <el-form-item prop="password">
         <el-input
+          type="password"
           size="large"
           v-model="loginModel.password"
-          type="password"
-          show-password
           placeholder="请输入密码"
-        />
+        ></el-input>
       </el-form-item>
-
-      <el-form-item>
+      <el-form-item prop="code">
         <el-row :gutter="20">
-          <el-col :span="16">
+          <el-col :span="16" :offset="0">
             <el-input
               size="large"
               v-model="loginModel.code"
               placeholder="请输入验证码"
-            />
+            ></el-input>
           </el-col>
-          <el-col :span="8">
+          <el-col :span="8" :offset="0">
             <img :src="imgSrc" class="image" @click="getImage" />
           </el-col>
         </el-row>
       </el-form-item>
-
-      <el-form-item label="用户类型">
+      <el-form-item label="用户类型" prop="userType">
         <el-radio-group v-model="loginModel.userType">
-          <el-radio value="1">会员</el-radio>
-          <el-radio value="2">员工</el-radio>
+          <el-radio :label="1">会员</el-radio>
+          <el-radio :label="2">员工</el-radio>
         </el-radio-group>
       </el-form-item>
-
       <el-form-item>
-        <el-row class="button-row">
-          <el-col :span="12" class="col-left">
+        <el-row style="width: 100%">
+          <el-col
+            :span="12"
+            :offset="0"
+            style="padding-right: 10px; padding-left: 0px"
+          >
             <el-button
-              class="button-full"
               size="large"
+              style="width: 100%"
               type="primary"
               @click="onSubmit"
+              >登录</el-button
             >
-              登录
-            </el-button>
           </el-col>
-          <el-col :span="12" class="col-right">
-            <el-button type="danger" plain class="button-full" size="large">
-              重置
-            </el-button>
+          <el-col
+            :span="12"
+            :offset="0"
+            style="padding-right: 0px; padding-left: 10px"
+          >
+            <el-button size="large" style="width: 100%" type="danger" plain
+              >重置</el-button
+            >
           </el-col>
         </el-row>
       </el-form-item>
@@ -75,88 +76,89 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue"
-import { ElMessage } from "element-plus"
-import useImage from "@/composables/login/useImage"
-import { loginApi } from "@/api/login/index"
-import { useRouter } from "vue-router"
-import { userStore } from "@/store/user"
-import { menuStore } from "@/store/menu"
-
-const store = userStore()
-const mstore = menuStore()
-const router = useRouter()
-const { imgSrc, getImage } = useImage()
-
-// 表单对象
+import useImage from "@/composables/login/useImage";
+import { reactive, ref } from "vue";
+import { loginApi } from "@/api/login/index";
+import {type FormInstance } from "element-plus";
+import { userStore } from "@/store/user";
+import { useRouter } from "vue-router";
+const store = userStore();
+const router = useRouter();
+const loginRef = ref<FormInstance>();
+//验证码
+const { imgSrc, getImage } = useImage();
+//登录表单对象
 const loginModel = reactive({
-  username: "",
-  password: "",
+  username: "admin",
+  password: "123456",
   code: "",
   userType: "",
-})
-
-// 表单验证规则
-const rules = reactive({})
-
-// 登录提交
-const onSubmit = async () => {
-  // 验证表单字段
-  if (!loginModel.username || !loginModel.password || !loginModel.code || !loginModel.userType) {
-    ElMessage.error("请填写完整的登录信息")
-    return
-  }
-
-  try {
-    const res = await loginApi(loginModel)
-    // 业务成功
-    if (res && res.code === 200) {
-      // 清除旧的菜单缓存，确保新用户能加载新的权限菜单
-      mstore.menuList = []
-
-      // 保存登录信息
-      store.setToken(res.data.token)
-      store.setUserId(res.data.userId)
-      store.setUserType(loginModel.userType)
-
-      ElMessage.success("登录成功")
-
-      // 延迟跳转，确保状态已更新
-      setTimeout(() => {
-        router.push({ path: "/dashboard" })
-      }, 500)
-    } else {
-      // 业务错误（后端返回 code !== 200）
-      ElMessage.error(res?.msg || "登录失败")
-      // 登录失败时，清空验证码输入框并重新获取验证码图片
-      loginModel.code = ""
-      getImage()
+});
+//表单验证规则
+const rules = reactive({
+  username: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写账户",
+    },
+  ],
+  password: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写密码",
+    },
+  ],
+  code: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写验证码",
+    },
+  ],
+  userType: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请选择用户类型",
+    },
+  ],
+});
+//登录提交
+const onSubmit = () => {
+  loginRef.value?.validate(async (valid) => {
+    if (valid) {
+      let res = await loginApi(loginModel);
+      if (res && res.code == 200) {
+        //存储userid和token
+        store.setToken(res.data.token);
+        store.setUserId(res.data.userId);
+        store.setUserType(res.data.userType)
+        //跳转到首页
+        router.push({ path: "/" });
+      }
     }
-  } catch (error) {
-    // 网络错误，拦截器已经弹窗提示，这里只记录错误
-    console.error("登录网络错误:", error)
-  }
-}
+  });
+};
 </script>
 
 <style scoped lang="scss">
 .logincontainer {
   background-color: #fff;
   height: 100%;
+  background-image: url("../../assets/bg.png");
+  background-size: 100% 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("../../assets/bg.png");
-  background-size: 100% 100%;
-
-  .loginForm {
+  .loginform {
     border-radius: 10px;
     background-color: #fff;
-    width: 430px;
     height: 340px;
+    width: 420px;
     padding: 20px 35px;
-
-    .loginTitle {
+    .logintitle {
       width: 100%;
       font-size: 24px;
       font-weight: 600;
@@ -164,37 +166,14 @@ const onSubmit = async () => {
       justify-content: center;
       align-items: center;
     }
-
     .image {
       height: 40px;
       width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       cursor: pointer;
-      border: 1px solid #dcdfe6;
-      border-radius: 4px;
     }
   }
-}
-
-.form-item-center {
-  display: flex;
-  justify-content: center;
-}
-
-.button-row {
-  width: 100%;
-}
-
-.col-left {
-  padding-right: 10px;
-  padding-left: 0;
-}
-
-.col-right {
-  padding-right: 0;
-  padding-left: 10px;
-}
-
-.button-full {
-  width: 100%;
 }
 </style>

@@ -1,340 +1,310 @@
 <template>
-	<SysDialog
-		:title="dialog.title"
-		:width="dialog.width"
-		:height="dialog.height"
-		:visible="dialog.visible"
-		@onClose="onClose"
-		@onConfirm="commit"
-	>
-		<template #content>
-			<el-form
-				ref="addFormRef"
-				:model="addModel"
-				:rules="rules"
-				label-width="80px"
-				size="default"
-			>
-				<el-row>
-					<el-col :offset="0" :span="12">
-						<el-form-item label="商品名称" prop="name">
-							<el-input v-model="addModel.name" />
-						</el-form-item>
-					</el-col>
-					<el-col :offset="0" :span="12">
-						<el-form-item label="商品价格" prop="price">
-							<el-input v-model="addModel.price" />
-						</el-form-item>
-					</el-col>
-				</el-row>
+  <SysDialog
+    :title="dialog.title"
+    :width="dialog.width"
+    :height="dialog.height"
+    :visible="dialog.visible"
+    @onClose="onClose"
+    @onConfirm="commit"
+  >
+    <template v-slot:content>
+      <el-form
+        :model="addModel"
+        ref="addFormRef"
+        :rules="rules"
+        label-width="80px"
+        size="default"
+      >
+        <el-row>
+          <el-col :span="12" :offset="0">
+            <el-form-item prop="name" label="商品名称">
+              <el-input v-model="addModel.name"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" :offset="0">
+            <el-form-item prop="price" label="商品价格">
+              <el-input v-model="addModel.price"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12" :offset="0">
+            <el-form-item prop="unit" label="单位">
+              <el-input v-model="addModel.unit"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12" :offset="0">
+            <el-form-item prop="specs" label="规格">
+              <el-input v-model="addModel.specs"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12" :offset="0">
+            <el-form-item prop="store" label="库存">
+              <el-input v-model="addModel.store"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item prop="image" label="商品图片">
+          <el-upload
+            ref="uploadRef"
+            action="#"
+            :on-change="uploadFile"
+            list-type="picture-card"
+            :auto-upload="false"
+            :file-list="fileList"
+            :limit="1"
+          >
+            <el-icon><Plus /></el-icon>
 
-				<el-row>
-					<el-col :offset="0" :span="12">
-						<el-form-item label="单位" prop="unit">
-							<el-input v-model="addModel.unit" />
-						</el-form-item>
-					</el-col>
-					<el-col :offset="0" :span="12">
-						<el-form-item label="规格" prop="specs">
-							<el-input v-model="addModel.specs" />
-						</el-form-item>
-					</el-col>
-				</el-row>
+            <template #file="{ file }">
+              <div>
+                <img
+                  class="el-upload-list__item-thumbnail"
+                  :src="file.url"
+                  alt=""
+                />
+                <span class="el-upload-list__item-actions">
+                  <span
+                    class="el-upload-list__item-preview"
+                    @click="handlePictureCardPreview(file)"
+                  >
+                    <el-icon><zoom-in /></el-icon>
+                  </span>
+                  <span
+                    v-if="!disabled"
+                    class="el-upload-list__item-delete"
+                    @click="handleRemove(file)"
+                  >
+                    <el-icon><Delete /></el-icon>
+                  </span>
+                </span>
+              </div>
+            </template>
+          </el-upload>
 
-				<el-row>
-					<el-col :offset="0" :span="12">
-						<el-form-item label="库存" prop="store">
-							<el-input v-model="addModel.store" />
-						</el-form-item>
-					</el-col>
-				</el-row>
-
-				<el-form-item label="商品图片" prop="image">
-					<el-upload
-						ref="uploadRef"
-						action="#"
-						:auto-upload="false"
-						:file-list="fileList"
-						:limit="1"
-						list-type="picture-card"
-						:on-change="uploadFile"
-					>
-						<el-icon><Plus /></el-icon>
-						<template #file="{ file }">
-							<div>
-								<img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
-								<span class="el-upload-list__item-actions">
-									<span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-										<el-icon><zoom-in /></el-icon>
-									</span>
-									<span
-										v-if="!disabled"
-										class="el-upload-list__item-delete"
-										@click="handleRemove(file)"
-									>
-										<el-icon><Delete /></el-icon>
-									</span>
-								</span>
-							</div>
-						</template>
-					</el-upload>
-					<el-dialog v-model="dialogVisible">
-						<img w-full :src="dialogImageUrl" alt="Preview Image" />
-					</el-dialog>
-				</el-form-item>
-
-				<el-form-item label="商品详情" prop="details">
-					<div style="border: 1px solid #ccc; position: relative; z-index: 1;">
-						<Toolbar
-							:defaultConfig="toolbarConfig"
-							:editor="editorRef"
-							:mode="mode"
-							style="border-bottom: 1px solid #ccc"
-						/>
-						<Editor
-							v-model="valueHtml"
-							:defaultConfig="editorConfig"
-							:mode="mode"
-							style="height: 300px; overflow-y: hidden;"
-							@onCreated="handleCreated"
-						/>
-					</div>
-				</el-form-item>
-			</el-form>
-		</template>
-	</SysDialog>
+          <el-dialog v-model="dialogVisible">
+            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+          </el-dialog>
+        </el-form-item>
+        <el-form-item prop="details" label="商品详情">
+          <div style="border: 1px solid #ccc">
+            <Toolbar
+              style="border-bottom: 1px solid #ccc"
+              :editor="editorRef"
+              :defaultConfig="toolbarConfig"
+              :mode="mode"
+            />
+            <Editor
+              style="height: 300px; overflow-y: hidden"
+              v-model="valueHtml"
+              :defaultConfig="editorConfig"
+              :mode="mode"
+              @onCreated="handleCreated"
+            />
+          </div>
+        </el-form-item>
+      </el-form>
+    </template>
+  </SysDialog>
 </template>
 
 <script setup lang="ts">
-import "@wangeditor/editor/dist/css/style.css";
-// @ts-ignore
+import "@wangeditor/editor/dist/css/style.css"; // 引入 css
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
-import { ElMessage, type FormInstance, type UploadFile } from "element-plus";
-import { nextTick, reactive, ref } from "vue";
-import { addApi, editApi } from "@/api/goods/index";
-import type { GoodsType } from "@/api/goods/GoodsModel";
-import useEditor from "@/composables/course/useEditor";
-import useUpload from "@/composables/course/useUpload";
+import {type GoodsType } from "@/api/goods/GoodsModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import useInstance from "@/hooks/useInstance";
+import { ElMessage,type FormInstance } from "element-plus";
+import { nextTick, reactive, ref } from "vue";
+import useUpload from "@/composables/course/useUpload";
+import useEditor from "@/composables/course/useEditor";
+import { addApi, editApi } from "@/api/goods/index";
 import { EditType, Title } from "@/type/BaseEnum";
-
+import useInstance from "@/hooks/useInstance";
 const { global } = useInstance();
-
-// 图片上传
+//图片上传
 const {
-	dialogImageUrl,
-	dialogVisible,
-	disabled,
-	handleRemove,
-	handlePictureCardPreview,
-	uploadFile,
-	uploadRef,
-	imgurl,
-	fileList,
+  dialogImageUrl,
+  dialogVisible,
+  disabled,
+  handleRemove,
+  handlePictureCardPreview,
+  uploadFile,
+  uploadRef,
+  imgurl,
+  fileList,
 } = useUpload();
-
-// 文本编辑器
-const { editorRef, handleCreated, mode, editorConfig, valueHtml, toolbarConfig } = useEditor();
-
-// 表单 ref
+//文本编辑器
+const {
+  editorRef,
+  handleCreated,
+  mode,
+  editorConfig,
+  valueHtml,
+  toolbarConfig,
+} = useEditor();
+//表单ref属性
 const addFormRef = ref<FormInstance>();
-
-// 弹框属性
-const { dialog, onClose, onShow } = useDialog();
-
-// 对外暴露
+//弹框属性
+const { dialog, onClose, onConfirm, onShow } = useDialog();
+//定义外部使用的方法
+const show = (type: string, row?: GoodsType) => {
+  //清空图片数据
+  fileList.value = [];
+  //设置弹框属性
+  type == EditType.ADD
+    ? (dialog.title = Title.ADD)
+    : (dialog.title = Title.EDIT);
+  dialog.width = 900;
+  dialog.height = 500;
+  //清空图片和文本编辑器
+  const upload = uploadRef.value;
+  if (upload) {
+    upload.clearFiles();
+  }
+  // addModel.image = "";
+  if (type == EditType.ADD) {
+    const editor = editorRef.value;
+    if (editor) {
+      editor.clear();
+    }
+  }
+  // addModel.details = "";
+  //编辑数据回显
+  if (type == EditType.EDIT) {
+    nextTick(() => {
+      global.$objCopy(row, addModel);
+      //图片回显
+      if (row?.image) {
+        //图片回显
+        let img = {
+          name: "",
+          url: "",
+        } as any;
+        imgurl.value = addModel.image;
+        img.url = addModel.image;
+        fileList.value.push(img);
+      }
+    });
+  }
+  if (row && row.details) {
+    //文本编辑器的回显
+    valueHtml.value = row.details;
+  }
+  onShow();
+  addFormRef.value?.resetFields()
+  addModel.type = type;
+};
+//暴露出去
 defineExpose({
-	show,
+  show,
 });
-
-type GoodsForm = Omit<GoodsType, "price" | "store"> & { price: number | null; store: number | null };
-
-// 表单绑定对象
-const addModel = reactive<GoodsForm>({
-	type: "",
-	goodsId: "",
-	name: "",
-	image: "",
-	details: "",
-	unit: "",
-	specs: "",
-	price: null,
-	store: null,
+//表单绑定的对象
+const addModel = reactive<GoodsType>({
+  type: "",
+  goodsId: "",
+  name: "",
+  image: "",
+  details: "",
+  unit: "",
+  specs: "",
+  price: 0,
+  store: 0,
 });
-
-const validatePrice = (_rule: any, value: any, callback: any) => {
-	if (value == null || value <= 0) {
-		callback(new Error("请填写商品价格"));
-	} else {
-		callback();
-	}
+const validatePrice = (rule: any, value: any, callback: any) => {
+  if (value === 0 || value < 0) {
+    callback(new Error("请填写商品价格"));
+  } else {
+    callback();
+  }
 };
-
-const validateStore = (_rule: any, value: any, callback: any) => {
-	if (value == null || value <= 0) {
-		callback(new Error("请填写商品库存"));
-	} else {
-		callback();
-	}
+const validateStore = (rule: any, value: any, callback: any) => {
+  if (value === 0 || value < 0) {
+    callback(new Error("请填写商品库存"));
+  } else {
+    callback();
+  }
 };
-
-// 表单验证规则
+//表单验证规则
 const rules = reactive({
-	name: [
-		{
-			required: true,
-			trigger: "blur",
-			message: "请输入商品名称",
-		},
-	],
-	image: [
-		{
-			required: true,
-			trigger: "blur",
-			message: "请上传商品图片",
-		},
-	],
-	unit: [
-		{
-			required: true,
-			trigger: "blur",
-			message: "请填写单位",
-		},
-	],
-	details: [
-		{
-			required: true,
-			trigger: "blur",
-			message: "请填写商品详情",
-		},
-	],
-	specs: [
-		{
-			required: true,
-			trigger: "blur",
-			message: "请填写商品规格",
-		},
-	],
-	price: [
-		{
-			required: true,
-			validator: validatePrice,
-			trigger: "blur",
-		},
-	],
-	store: [
-		{
-			required: true,
-			validator: validateStore,
-			trigger: "blur",
-		},
-	],
+  name: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请输入商品名称",
+    },
+  ],
+  image: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请上传商品图片",
+    },
+  ],
+  unit: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写单位",
+    },
+  ],
+  details: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写商品详情",
+    },
+  ],
+  specs: [
+    {
+      required: true,
+      trigger: "blur",
+      message: "请填写商品规格",
+    },
+  ],
+  price: [
+    {
+      required: true,
+      validator: validatePrice,
+      trigger: "blur",
+    },
+  ],
+  store: [
+    {
+      required: true,
+      validator: validateStore,
+      trigger: "blur",
+    },
+  ],
 });
-
-// 注册事件
+//注册事件
 const emits = defineEmits(["reFresh"]);
-
-// 对外方法
-const resetAddModel = () => {
-	addModel.type = "";
-	addModel.goodsId = "";
-	addModel.name = "";
-	addModel.image = "";
-	addModel.details = "";
-	addModel.unit = "";
-	addModel.specs = "";
-	addModel.price = null;
-	addModel.store = null;
-};
-
-function show(type: string, row?: GoodsType) {
-	fileList.value = [];
-	imgurl.value = "";
-
-	if (type === EditType.ADD) {
-		dialog.title = Title.ADD;
-	} else {
-		dialog.title = Title.EDIT;
-	}
-	dialog.width = 900;
-	dialog.height = 500;
-
-	const upload = uploadRef.value;
-	if (upload) {
-		upload.clearFiles();
-	}
-
-	if (type === EditType.ADD) {
-		resetAddModel();
-		valueHtml.value = "";
-		const editor = editorRef.value;
-		if (editor) {
-			editor.clear();
-		}
-	}
-
-	if (type === EditType.EDIT) {
-		nextTick(() => {
-			global.$objCopy(row, addModel);
-
-			if (row?.image) {
-				const img: UploadFile = {
-					name: "image",
-					url: row.image,
-					status: "success",
-					uid: Date.now(),
-				};
-				imgurl.value = row.image;
-				fileList.value.push(img);
-			}
-
-			// 用 setTimeout 确保编辑器完全渲染后再设置内容
-			setTimeout(() => {
-				if (row && row.details) {
-					valueHtml.value = row.details;
-				}
-				const editor = editorRef.value;
-				if (editor && typeof editor.focus === 'function') {
-					editor.focus();
-				}
-			}, 100);
-		});
-	}
-
-	onShow();
-	addFormRef.value?.clearValidate();
-	addModel.type = type;
-}
-
-// 提交表单
+//提交表单
 const commit = () => {
-	addModel.image = imgurl.value;
-	addModel.details = valueHtml.value;
+  // if(addModel.type == EditType.ADD){
 
-	addFormRef.value?.validate(async (valid) => {
-		if (valid) {
-			let res = null;
-			// 确保类型转换，price 和 store 转为 number
-			const submitData = {
-				...addModel,
-				price: Number(addModel.price),
-				store: Number(addModel.store)
-			};
-			if (addModel.type === EditType.ADD) {
-				res = await addApi(submitData as GoodsType);
-			} else {
-				res = await editApi(submitData as GoodsType);
-			}
-
-			if (res && res.code === 200) {
-				ElMessage.success(res.msg);
-				emits("reFresh");
-				onClose();
-			}
-		}
-	});
+  // }
+  //封面图地址
+  addModel.image = imgurl.value;
+  //商品详情
+  addModel.details = valueHtml.value;
+  addFormRef.value?.validate(async (valid) => {
+    if (valid) {
+      let res: any;
+      if (addModel.type == EditType.ADD) {
+        res = await addApi(addModel);
+      } else {
+        res = await editApi(addModel);
+      }
+      if (res && res.code == 200) {
+        ElMessage.success(res.msg);
+        emits("reFresh");
+        onClose();
+      }
+    }
+  });
 };
 </script>
 

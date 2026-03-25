@@ -1,16 +1,16 @@
-import type { GoodsParam, GoodsType } from "./GoodsModel"
-import http from "@/http"
+import http from '@/http'
+import {GoodsType,GoodsParam} from './GoodsModel'
 //新增
 export const addApi = (param:GoodsType)=>{
-    return http.post('/api/goods',param)
+    return http.post("/api/goods",param)
 }
-//列表
+//查询商品列表
 export const listApi = (param:GoodsParam)=>{
     return http.get("/api/goods/list",param)
 }
 //编辑
 export const editApi = (param:GoodsType)=>{
-    return http.put('/api/goods',param)
+    return http.put("/api/goods",param)
 }
 //删除
 export const deleteApi = (goodsId:string)=>{

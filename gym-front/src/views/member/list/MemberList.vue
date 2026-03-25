@@ -1,6 +1,6 @@
 <template>
   <el-main>
-    <!-- 搜索栏 -->
+    <!--搜索栏 -->
     <el-form :model="listParam" :inline="true" size="default">
       <el-form-item>
         <el-input v-model="listParam.name" placeholder="请输入姓名"></el-input>
@@ -16,14 +16,14 @@
       </el-form-item>
       <el-form-item>
         <el-button :icon="Search" @click="searchBtn">搜索</el-button>
-        <el-button type="danger" plain :icon="Close" @click="resetBtn">
-          重置
-        </el-button>
+        <el-button type="danger" plain :icon="Close" @click="resetBtn"
+          >重置</el-button
+        >
         <el-button :icon="Plus" type="primary" @click="addBtn">新增</el-button>
       </el-form-item>
     </el-form>
     <!-- 表格 -->
-    <el-table :height="tableHeight" :data="tableList.list" border stripe row-key="memberId">
+    <el-table :height="tableHeight" :data="tableList.list" border stripe>
       <el-table-column
         prop="username"
         width="150"
@@ -40,12 +40,12 @@
       ></el-table-column>
       <el-table-column prop="sex" label="性别">
         <template #default="scope">
-          <el-tag v-if="scope.row.sex == '0'" type="success" size="default">
-            男
-          </el-tag>
-          <el-tag v-if="scope.row.sex == '1'" type="danger" size="default">
-            女
-          </el-tag>
+          <el-tag v-if="scope.row.sex == '0'" type="success" size="default"
+            >男</el-tag
+          >
+          <el-tag v-if="scope.row.sex == '1'" type="danger" size="default"
+            >女</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column prop="age" label="年龄"></el-table-column>
@@ -64,12 +64,12 @@
       <el-table-column prop="waist" label="腰围"></el-table-column>
       <el-table-column prop="status" label="状态">
         <template #default="scope">
-          <el-tag v-if="scope.row.status == '1'" type="success" size="default">
-            启用
-          </el-tag>
-          <el-tag v-if="scope.row.status == '0'" type="danger" size="default">
-            停用
-          </el-tag>
+          <el-tag v-if="scope.row.status == '1'" type="success" size="default"
+            >启用</el-tag
+          >
+          <el-tag v-if="scope.row.status == '0'" type="danger" size="default"
+            >停用</el-tag
+          >
         </template>
       </el-table-column>
       <el-table-column label="操作" width="220" fixed="right" align="center">
@@ -79,12 +79,11 @@
             :icon="Edit"
             size="default"
             @click="joinBtn(scope.row)"
+            >办卡</el-button
           >
-            办卡
-          </el-button>
           <el-button type="primary">
             <el-dropdown>
-              <span class="el-dropdown-link" style="color: #fff">
+              <span class="el-dropdown-link" style="color:#FFF">
                 更多
                 <el-icon class="el-icon--right">
                   <arrow-down />
@@ -92,15 +91,10 @@
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item :icon="ChatLineSquare" @click="rechargeBtn(scope.row)">
-                    充值
-                  </el-dropdown-item>
-                  <el-dropdown-item :icon="Edit" @click="editBtn(scope.row)">
-                    编辑
-                  </el-dropdown-item>
-                  <el-dropdown-item type="danger" :icon="Delete" @click="deleteBtn(scope.row)">
-                    删除
-                  </el-dropdown-item>
+                  <el-dropdown-item :icon="ChatLineSquare" @click="rechargeBtn(scope.row)">充值</el-dropdown-item>
+                  <el-dropdown-item :icon="Edit" @click="editBtn(scope.row)">编辑</el-dropdown-item>
+                  <el-dropdown-item type="danger" :icon="Delete" @click="deleteBtn(scope.row)">删除</el-dropdown-item>
+                  <el-dropdown-item :icon="Edit" @click="resetPasBtn(scope.row)">重置密码</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -128,24 +122,17 @@
     <Recharge ref="rechargeRef" @refresh="refresh"></Recharge>
   </el-main>
 </template>
+
 <script setup lang="ts">
 import JoinApply from "./JoinApply.vue";
 import AddMember from "./AddMember.vue";
 import Recharge from "./Recharge.vue";
-import {
-  Plus,
-  Edit,
-  Delete,
-  Search,
-  Close,
-  ChatLineSquare,
-} from "@element-plus/icons-vue";
+import { Plus, Edit, Delete, Search, Close,ChatLineSquare } from "@element-plus/icons-vue";
 import useTable from "@/composables/member/useTable";
 import useMember from "@/composables/member/useMember";
 import useJoin from "@/composables/member/useJoin";
 import useRecharge from "@/composables/member/useRecharge";
-
-// 表格相关
+//表格相关
 const {
   listParam,
   getList,
@@ -157,14 +144,12 @@ const {
   tableHeight,
   refresh,
 } = useTable();
-
-// 新增、编辑操作
-const { addBtn, editBtn, deleteBtn, addRef } = useMember(getList);
-
-// 办卡
+//新增、编辑操作
+const { addBtn, editBtn, deleteBtn,resetPasBtn, addRef } = useMember(getList);
+//办卡
 const { joinRef, joinBtn } = useJoin();
-
-// 充值
+//充值
 const { rechargeRef, rechargeBtn } = useRecharge();
 </script>
+
 <style scoped></style>

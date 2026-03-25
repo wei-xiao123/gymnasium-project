@@ -1,11 +1,13 @@
 //定义角色类型
 export type RoleType = {
-    value: string,
-    label: string
-    }
+    value:string,
+    label:string
+}
+
 export type SelectRole = {
-    list: RoleType[]
-    }
+    list:RoleType[]
+}
+
 //列表查询参数类型
 export type ListParam = {
     phone: string,
@@ -13,7 +15,8 @@ export type ListParam = {
     currentPage: number,
     pageSize: number,
     total: number
-    }
+}
+
 //用户数据类型
 export type AddUserModel = {
     userId: string,
@@ -28,7 +31,4 @@ export type AddUserModel = {
     status: string,
     salary: string,
     nickName: string
-    }
-
-
-
+}

@@ -1,11 +1,11 @@
-//列表查询参数类型
+//查询参数类型
 export type ListParam = {
     title:string,
     currentPage:number,
     pageSize:number,
     total:number
 }
-//表单数据类型
+// 表单提交的会员卡数据类型
 export type CardType = {
     type:string,
     title:string,

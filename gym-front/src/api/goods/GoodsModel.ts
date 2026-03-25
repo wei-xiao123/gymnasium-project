@@ -1,11 +1,3 @@
-//列表查询参数类型
-export type GoodsParam = {
-    currentPage:number,
-    pageSize:number,
-    name:string,
-    total:number,
-}
-
 //商品数据类型
 export type GoodsType = {
     type:string,
@@ -17,4 +9,16 @@ export type GoodsType = {
     specs:string,
     price:number,
     store:number,
+    num?:number
+}
+//商品查询的数据类型
+export type GoodsParam = {
+    currentPage:number,
+    pageSize:number,
+    name:string,
+    total:number
+}
+//定义购物车模型
+export type AddCar = {
+    list:GoodsType[]
 }

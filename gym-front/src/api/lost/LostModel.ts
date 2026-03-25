@@ -1,11 +1,3 @@
-//列表参数类型
-export type LostParam = {
-    currentPage:number,
-    pageSize:number,
-    lostName:string,
-    total:number
-}
-
 //失物数据类型
 export type LostType = {
     type:string,
@@ -16,5 +8,12 @@ export type LostType = {
     foundPerson:string,
     foundPhone:string,
     status:string,
-    lostPerson:string,
+    lostPerson:string
+}
+//分页查询参数类型
+export type LostParam = {
+    currentPage:number,
+    pageSize:number,
+    lostName:string,
+    total:number
 }

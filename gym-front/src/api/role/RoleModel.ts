@@ -1,13 +1,12 @@
 // 角色数据类型
-export type AddRoleModel = {
-  type: string
-  roleId: string
-  roleName: string
-  remark: string
-  types: string
-}
+export type AddRoleModel={
+    type:string,
+    roleId:string,
+    roleName:string,
+    remark:string
+ }
 
-//列表查询参数类型
+//分页查询参数类型
 export type ListParam = {
     roleName:string,
     currentPage:number,
@@ -16,11 +15,11 @@ export type ListParam = {
 }
 
 export type AssignParam = {
-  roleId:string,
-  userId:string
+    roleId:string,
+    userId:string
 }
 
 export type SaveAssignParam = {
-  roleId:string,
-  list:Array<string>
+    roleId:string,
+    list:Array<string>
 }

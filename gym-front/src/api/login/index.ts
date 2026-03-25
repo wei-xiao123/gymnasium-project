@@ -1,22 +1,22 @@
-import http from "@/http/index"
-import type { LoginParam, InfoParam } from "./LoginModel"
+import http from '@/http'
+import type {InfoParam, LoginParam} from './LoginModel'
 
-// 获取验证码
-export const getImageApi = () => {
-  return http.post("/api/login/image")
+//获取验证码
+export const getImageApi = ()=>{
+    return http.post("/api/login/image")
 }
 
-// 登录
-export const loginApi = (param: LoginParam) => {
-  return http.post("/api/login/login", param)
+//登录
+export const loginApi = (param:LoginParam)=>{
+    return http.post("/api/login/login",param)
 }
 
-//获取菜单数据
+//动态获取菜单数据
 export const getMenuListApi = (param:InfoParam)=>{
     return http.get("/api/login/getMenuList",param)
 }
 
-//获取用户信息
+//查询用户信息
 export const getInfoApi = (param:InfoParam)=>{
     return http.get("/api/login/getInfo",param)
 }
