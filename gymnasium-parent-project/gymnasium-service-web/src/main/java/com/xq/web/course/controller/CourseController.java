@@ -94,5 +94,25 @@ public class CourseController {
         memberCourseService.joinCourse(memberCourse);
         return ResultUtils.success("报名成功!");
     }
+
+    //我的课程列表
+    @GetMapping("/getMyCourseList")
+    public ResultVo getMyCourseList(PageParam pageParam){
+        if(pageParam.getUserType().equals("1")){ //会员
+            IPage<MemberCourse> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
+            QueryWrapper<MemberCourse> query = new QueryWrapper<>();
+            query.lambda().eq(MemberCourse::getMemberId,pageParam.getUserId()
+            );
+            IPage<MemberCourse> list = memberCourseService.page(page,query);
+            return ResultUtils.success("查询成功",list);
+        }else{
+            IPage<Course> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
+            QueryWrapper<Course> query = new QueryWrapper<>();
+            query.lambda().eq(Course::getTeacherId,pageParam.getUserId());
+            IPage<Course> list = courseService.page(page, query);
+            return ResultUtils.success("查询成功",list);
+        }
+    }
+
 }
 

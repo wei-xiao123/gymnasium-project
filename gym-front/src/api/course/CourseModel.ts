@@ -24,3 +24,11 @@ export type SelectCoure = {
     courseId:string,
     memberId:string
 }
+
+export type MyCourseListParam = {
+    userType:string,
+    userId:string,
+    currentPage:number,
+    pageSize:number,
+    total:number
+}
