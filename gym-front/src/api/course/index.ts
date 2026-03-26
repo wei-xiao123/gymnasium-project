@@ -1,5 +1,5 @@
 import http from "@/http";
-import type {CourseListParam, CourseType} from './CourseModel.ts'
+import type {CourseListParam, CourseType ,SelectCoure} from './CourseModel.ts'
 //新增
 export const addApi = (param:CourseType)=>{
     return http.post("/api/course",param)
@@ -23,4 +23,8 @@ export const editApi = (param:CourseType)=>{
 //删除
 export const deleteApi = (courseId:string)=>{
     return http.delete(`/api/course/${courseId}`)
+}
+//选课
+export const joinCourseApi = (param:SelectCoure)=>{
+    return http.post("/api/course/joinCourse",param)
 }

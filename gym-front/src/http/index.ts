@@ -1,11 +1,13 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosRequestHeaders } from "axios";
+import * as Axios from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosRequestHeaders } from "axios";
+const axios = Axios.default;
 import { ElMessage } from 'element-plus';
 import { userStore } from '@/store/user'
 
 //axios请求配置
 const config = {
     //baseURL: 'http://localhost:8089', //真实请求接口的地址,真实上线是一个域名
-    baseURL: process.env.BASE_API,
+    baseURL: import.meta.env.VITE_BASE_API || 'http://localhost:8089',
     timeout: 10000,
     withCredentials: true //解决sesson不一致的问题
 }

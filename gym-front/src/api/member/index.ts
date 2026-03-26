@@ -14,7 +14,7 @@ export const getCardListApi = ()=>{
     return http.get("/api/member/getCardList")
 }
 //编辑
-export const editApi = (param: MemberParam)=>{
+export const editApi = (param: MemberType)=>{
     return http.put("/api/member",param)
 }
 //删除

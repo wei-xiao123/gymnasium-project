@@ -82,7 +82,7 @@ const show = (type: string, row?: CardType) => {
   if (type == EditType.EDIT) {
     //把要编辑的数据复制到表单对象
     nextTick(() => {
-      global.$objCoppy(row, addModel);
+      global.$objCopy(row, addModel);
     });
   }
   addModel.type = type;
@@ -146,7 +146,7 @@ const emits = defineEmits(["refresh"]);
 const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null;
+      let res: any;
       if(addModel.type == EditType.ADD){
         res = await addApi(addModel);
       }else{

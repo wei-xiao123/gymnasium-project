@@ -1,7 +1,7 @@
 import type { CourseType } from "@/api/course/CourseModel"
 import { EditType } from "@/type/BaseEnum"
 import { ref } from "vue"
-import { deleteApi,} from "@/api/course"
+import { deleteApi,joinCourseApi} from "@/api/course"
 import { ElMessage } from "element-plus"
 import type { FuncList } from "@/type/BaseType"
 import useInstance from "@/hooks/useInstance"
@@ -36,11 +36,25 @@ export default function useCourse(getList:FuncList){
         }
     }
 
+    //选课
+    const joinBtn = async (row: CourseType) => {
+        const confirm = await global.$myconfirm('确定选课该课程吗?')
+        if (confirm) {
+            const res = await joinCourseApi({
+                courseId: row.courseId,
+                memberId: store.getUserId
+            })
+            if (res && res.code == 200) {
+                ElMessage.success(res.msg)
+            }
+        }
+    }
 
     return {
         addBtn,
         editBtn,
         deleteBtn,
         addRef,
+        joinBtn
     }
 }

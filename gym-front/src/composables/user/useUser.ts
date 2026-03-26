@@ -9,7 +9,7 @@ import { resetPasswordApi } from '@/api/home'
 export default function useUser(getList: FuncList) {
     const { global } = useInstance()
     //新增组件的ref属性
-    const addRef = ref<{ show: (type: string, row?: AddUserModel) => void }>()
+    const addRef = ref<{ show: (type: string, row?: AddUserModel) => Promise<void> }>()
     //新增
     const addBtn = () => {
         //父组件调用子组件的show方法

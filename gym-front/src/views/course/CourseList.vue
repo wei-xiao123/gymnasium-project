@@ -9,19 +9,20 @@
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="listParam.teacherName" placeholder="教练"></el-input>
+        <el-input
+          v-model="listParam.teacherName"
+          placeholder="教练"
+        ></el-input>
       </el-form-item>
       <el-form-item>
         <el-button :icon="Search" @click="searchBtn">搜索</el-button>
         <el-button :icon="Close" @click="resetBtn">重置</el-button>
-        <el-button
-          :icon="Plus"
-          type="primary"
-          @click="addBtn"
-          >新增</el-button
-        >
+        <el-button :icon="Plus" type="primary" @click="addBtn">
+          新增
+        </el-button>
       </el-form-item>
     </el-form>
+
     <!-- 表格 -->
     <el-table :height="tableHeight" :data="tableData.list" border stripe>
       <el-table-column prop="image" width="90" label="课程封面" align="center">
@@ -43,55 +44,55 @@
             :icon="Edit"
             size="default"
             @click="editBtn(scope.row)"
-            >编辑</el-button
           >
+            编辑
+          </el-button>
+          <el-button
+            type="success"
+            :icon="Edit"
+            size="default"
+            @click="joinBtn(scope.row)"
+          >
+            报名
+          </el-button>
           <el-button
             type="danger"
             :icon="Delete"
             size="default"
             @click="deleteBtn(scope.row)"
-            >删除</el-button
           >
+            删除
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
+
     <!-- 分页 -->
     <el-pagination
+      v-model:current-page="listParam.currentPage"
+      v-model:page-size="listParam.pageSize"
+      :page-sizes="[10, 20, 40, 80, 100]"
+      :total="listParam.total"
+      layout="total, sizes, prev, pager, next, jumper"
+      background
       @size-change="sizeChange"
       @current-change="currentChange"
-      :current-page.sync="listParam.currentPage"
-      :page-sizes="[10, 20, 40, 80, 100]"
-      :page-size="listParam.pageSize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="listParam.total"
-      background
-    >
-    </el-pagination>
+    ></el-pagination>
 
     <!-- 新增、编辑 -->
     <AddCourse ref="addRef" @reFresh="reFresh"></AddCourse>
   </el-main>
 </template>
-
 <script setup lang="ts">
-import AddCourse from "./AddCourse.vue";
-import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue";
-import useTable from "../../composables/course/useTable";
-import useCourse from "../../composables/course/useCourse";
-//列表
-const {
-  listParam,
-  tableData,
-  getList,
-  sizeChange,
-  currentChange,
-  tableHeight,
-  searchBtn,
-  resetBtn,
-  reFresh,
-} = useTable();
-//新增、编辑
-const { addBtn, editBtn, deleteBtn, addRef } = useCourse(getList);
-</script>
+import AddCourse from "./AddCourse.vue"
+import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue"
+import useTable from "../../composables/course/useTable"
+import useCourse from "../../composables/course/useCourse"
 
+// 表格相关
+const { listParam, tableData, getList, sizeChange, currentChange, tableHeight, searchBtn, resetBtn, reFresh } = useTable()
+
+// 新增、编辑
+const { addBtn, editBtn, deleteBtn, addRef, joinBtn } = useCourse(getList)
+</script>
 <style scoped></style>

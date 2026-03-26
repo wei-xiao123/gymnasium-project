@@ -99,7 +99,7 @@ defineExpose({
 const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null
+      let res: any
       if (addModel.type === EditType.ADD) {
         res = await addApi(addModel)
       } else {

@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { MemberType, Recharge } from "@/api/member/MemberModel";
+import type { MemberType, Recharge } from "@/api/member/MemberModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { ElMessage, FormInstance } from "element-plus";
+import { ElMessage,type FormInstance } from "element-plus";
 import { reactive, ref } from "vue";
 import { rechargeApi } from "@/api/member/index";
 import { userStore } from "@/store/user";

@@ -5,7 +5,7 @@
 </span>
 <template #dropdown>
 <el-dropdown-menu>
-<el-dropdown-item @click="loginOut">退出登录</el-dropdown￾item>
+<el-dropdown-item @click="loginOut">退出登录</el-dropdown-item>
 </el-dropdown-menu>
 </template>
 </el-dropdown>
@@ -31,24 +31,5 @@ window.location.href = "/login";
 height: 38px;
 width: 38px;
 border-radius: 50%;
-}
-</style>
-<template>
-<div class="header-container">
-<Collapse></Collapse>
-<bread-crumb></bread-crumb>
-</div>
-<LoginOut></LoginOut>
-</template>
-<script setup lang="ts">
-import { ref, reactive } from "vue";
-import LoginOut from "./LoginOut.vue";
-import Collapse from "./Collapse.vue";
-import BreadCrumb from "./BreadCrumb.vue";
-</script>
-<style scoped lang="scss">
-.header-container {
-display: flex;
-align-items: center;
 }
 </style>

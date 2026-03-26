@@ -49,8 +49,8 @@ const tableData = reactive({
  * 查询表格数据
  */
 const getList = async () => {
-  listParam.memberId = store.getUserId()
-  listParam.userType = store.getUserType()
+  listParam.memberId = store.userId
+  listParam.userType = store.userType
   
   const res = await getMyRechargeApi(listParam)
   if (res && res.code === 200) {

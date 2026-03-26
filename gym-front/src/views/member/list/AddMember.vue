@@ -10,7 +10,7 @@
     <template v-slot:content>
       <el-form
         :model="addModel"
-        ref="addRormRef"
+        ref="addFormRef"
         :rules="rules"
         label-width="80px"
         size="default"
@@ -138,21 +138,21 @@
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
 import { nextTick, reactive, ref } from "vue";
-import { MemberType } from "@/api/member/MemberModel";
-import { ElMessage, FormInstance } from "element-plus";
+import {type MemberType } from "@/api/member/MemberModel";
+import { ElMessage,type FormInstance } from "element-plus";
 import { addApi,editApi } from "@/api/member/index";
 import { EditType, Title,UserType } from "@/type/BaseEnum";
 import useInstance from "@/hooks/useInstance";
 import useSelectRole from "@/composables/user/useSelectRole";
 const { global } = useInstance();
-const addRormRef = ref<FormInstance>();
+const addFormRef = ref<FormInstance>();
 //角色
 const { roleData, listRole, roleMemberId, getMemberRole } = useSelectRole();
 //弹框属性
 const { dialog, onClose, onConfirm, onShow } = useDialog();
 //弹框显示
 const show = async(type: string, row?: MemberType) => {
-  await listRole(UserType.STUDENT)
+  await listRole()
   await getMemberRole(row!?.memberId)
   dialog.width = 720;
   dialog.height = 350;
@@ -161,14 +161,14 @@ const show = async(type: string, row?: MemberType) => {
     : (dialog.title = Title.EDIT);
   if (EditType.EDIT == type) {
     nextTick(() => {
-      global.$objCoppy(row, addModel);
+      global.$objCopy(row, addModel);
       addModel.roleId = roleMemberId.value
       addModel.password = ''
     });
   }
   addModel.type = type;
   onShow();
-  addRormRef.value?.resetFields()
+  addFormRef.value?.resetFields()
 };
 //暴露出去，给父组件调用
 defineExpose({
@@ -256,13 +256,13 @@ const rules = reactive({
 const emits = defineEmits(["refresh"]);
 //表单提交
 const commit = () => {
-  addRormRef.value?.validate(async (valid) => {
+  addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null;
+      let res: any;
       if(addModel.type == EditType.ADD){
         res = await addApi(addModel);
       }else{
-        res = await editApi(addModel)
+        res = await editApi(addModel);
       }
       if (res && res.code == 200) {
         ElMessage.success(res.msg);

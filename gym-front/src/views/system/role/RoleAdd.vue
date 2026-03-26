@@ -71,7 +71,6 @@ const addModel = reactive<AddRoleModel>({
   roleId: "",
   roleName: "",
   remark: "",
-  type: "",
 });
 //弹框属性
 const { dialog, onClose } = useDialog();

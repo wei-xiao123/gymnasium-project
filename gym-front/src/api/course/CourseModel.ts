@@ -18,3 +18,9 @@ export type CourseType = {
     coursePrice:number,
     teacherId:string
 }
+
+//选课参数类型
+export type SelectCoure = {
+    courseId:string,
+    memberId:string
+}

@@ -133,7 +133,7 @@ const show = async (type: string, row?: AddUserModel) => {
   if (type == EditType.EDIT) {
     //回显数据
     nextTick(() => {
-      global.$objCoppy(row, addModel);
+      global.$objCopy(row, addModel);
       addModel.roleId = roleId.value;
     });
   }
@@ -228,12 +228,14 @@ const rules = reactive({
   ],
 });
 //注册事件
-const emits = defineEmits(["refresh"]);
+const emits = defineEmits<{
+  refresh: [void]
+}>();
 //表单提交
 const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = null;
+      let res: any;
       if (addModel.type == EditType.ADD) {
         res = await addApi(addModel);
       } else {

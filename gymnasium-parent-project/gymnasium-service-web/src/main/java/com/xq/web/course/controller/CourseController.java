@@ -11,6 +11,8 @@ import com.xq.web.course.entity.PageParam;
 import com.xq.web.course.service.CourseService;
 import com.xq.web.member.entity.Member;
 import com.xq.web.member.service.MemberService;
+import com.xq.web.member_course.entity.MemberCourse;
+import com.xq.web.member_course.service.MemberCourseService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -65,4 +67,32 @@ public class CourseController {
         IPage<Course> list = courseService.page(page,query);
         return ResultUtils.success("查询成功",list);
     }
+
+    @Autowired
+    MemberService memberService;
+
+    @Autowired
+    MemberCourseService memberCourseService;
+
+    //报名课程
+    @PostMapping("/joinCourse")
+    public ResultVo joinCourse(@RequestBody MemberCourse memberCourse){
+        //查询是否报名过该课程
+        QueryWrapper<MemberCourse> query = new QueryWrapper<>();
+        query.lambda().eq(MemberCourse::getCourseId,memberCourse.getCourseId()).eq(MemberCourse::getMemberId,memberCourse.getMemberId());
+        MemberCourse one = memberCourseService.getOne(query);
+        if(one != null){
+            return ResultUtils.error("您已经报名该课程!");
+        }
+        //判断余额是否充足
+        Course course = courseService.getById(memberCourse.getCourseId());
+        Member member = memberService.getById(memberCourse.getMemberId());
+        int flag = member.getMoney().compareTo(course.getCoursePrice());
+        if(flag == -1){
+            return ResultUtils.error("您的余额不足，请充值!");
+        }
+        memberCourseService.joinCourse(memberCourse);
+        return ResultUtils.success("报名成功!");
+    }
 }
+

@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { MemberType, ApplyCard } from "@/api/member/MemberModel";
+import type { MemberType, ApplyCard } from "@/api/member/MemberModel";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
 import useJoin from "@/composables/member/useJoin";

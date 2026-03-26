@@ -6,7 +6,6 @@ import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import { createPinia } from 'pinia'
 import piniaPersist from 'pinia-plugin-persist'
-import '@/types/pinia-persist'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import objCopy from './utils/objCopy'
 import myconfirm from './utils/myconfirm'
@@ -14,6 +13,7 @@ import './permission'
 
 // 实例化 Pinia
 const pinia = createPinia()
+pinia.use(piniaPersist)
 const app = createApp(App)
 
 // 挂载全局属性
@@ -25,7 +25,6 @@ app.use(router)
     locale: zhCn,
   })
   .use(pinia)
-  .use(piniaPersist)
 
 app.mount('#app')
 

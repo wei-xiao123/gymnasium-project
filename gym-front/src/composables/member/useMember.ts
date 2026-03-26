@@ -31,10 +31,15 @@ export default function useMember(getList: FuncList){
             }
         }
     }
+    //重置密码
+    const resetPasBtn = async (row:MemberType)=>{
+        await addRef.value?.show(EditType.EDIT,row)
+    }
     return{
         addBtn,
         editBtn,
         deleteBtn,
+        resetPasBtn,
         addRef
     }
 }
