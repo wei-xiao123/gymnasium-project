@@ -19,3 +19,7 @@ export type GoodsParam = {
     name: string
     total: number
 }
+
+export type AddCar = {
+    list:GoodsType[]
+}
