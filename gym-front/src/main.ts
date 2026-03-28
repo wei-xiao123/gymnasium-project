@@ -10,6 +10,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import objCopy from './utils/objCopy'
 import myconfirm from './utils/myconfirm'
 import './permission'
+import * as echarts from 'echarts'
 
 // 实例化 Pinia
 const pinia = createPinia()
@@ -19,6 +20,8 @@ const app = createApp(App)
 // 挂载全局属性
 app.config.globalProperties.$objCopy = objCopy
 app.config.globalProperties.$myconfirm = myconfirm
+// 挂载echarts
+app.config.globalProperties.$echarts = echarts;
 
 app.use(router)
   .use(ElementPlus, {

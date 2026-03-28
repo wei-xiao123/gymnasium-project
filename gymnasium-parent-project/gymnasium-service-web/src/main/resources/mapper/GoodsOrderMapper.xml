@@ -2,4 +2,19 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xq.web.goods_order.mapper.GoodsOrderMapper">
+    <select id="hotGoods" resultType="com.xq.web.home.entity.EchartItem">
+            select g.`name` ,sum(gd.num) as value from goods as g inner join goods_order as gd on gd.goods_id = g.goods_id
+            GROUP BY g.goods_id order by value desc limit 7
+    </select>
+
+    <select id="hotCards" resultType="com.xq.web.home.entity.EchartItem">
+            select ma.card_type as name,count(ma.apply_id) as value from member_apply as ma
+            GROUP BY ma.card_type,ma.card_day order by value desc limit 7
+    </select>
+
+    <select id="hotCourse" resultType="com.xq.web.home.entity.EchartItem">
+            select c.course_name as name,count(mc.member_course_id) as value from course as c
+            left join member_course as mc on c.course_id = mc.course_id
+            GROUP BY c.course_id order by value desc limit 7
+    </select>
 </mapper>
