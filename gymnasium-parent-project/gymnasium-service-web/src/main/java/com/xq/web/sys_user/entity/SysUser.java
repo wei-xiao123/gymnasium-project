@@ -1,18 +1,18 @@
 package com.xq.web.sys_user.entity;
-
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
-
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Date;
 
 @Data
 @TableName("sys_user")
-public class SysUser {
+public class SysUser implements UserDetails {
     @TableId(type = IdType.AUTO)
     private Long userId;
     //表明roleId字段不属于sys_user表，需要排除
@@ -42,4 +42,7 @@ public class SysUser {
     private boolean isCredentialsNonExpired = true;
     //帐户是否可用(1 可用，0 删除用户)
     private boolean isEnabled = true;
+    //用户权限字段的集合 authorities字段不属于sys_user表，需要排除
+    @TableField(exist = false)
+    Collection<? extends GrantedAuthority> authorities;
 }

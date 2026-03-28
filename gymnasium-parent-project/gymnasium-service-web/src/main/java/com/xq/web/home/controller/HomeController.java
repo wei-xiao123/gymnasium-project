@@ -16,9 +16,15 @@ import com.xq.web.suggest.service.SuggestService;
 import com.xq.web.sys_user.entity.SysUser;
 import com.xq.web.sys_user.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RequestMapping("/api/home")
@@ -89,57 +95,79 @@ public class HomeController {
         return ResultUtils.success("查询成功",echartItems);
     }
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     //重置密码
     @PostMapping("/resetPassword")
     public ResultVo resetPassword(@RequestBody ResetPassword resetPassword){
-        if("1".equals(resetPassword.getUserType())){
+        if(resetPassword.getUserType().equals("1")){ // 会员
             Member member = new Member();
             member.setMemberId(resetPassword.getUserId());
-            member.setPassword("666666");
+            member.setPassword(passwordEncoder.encode("666666")); //密码统一重置成666666
             memberService.updateById(member);
-            return ResultUtils.success("密码重置成功!");
-        }else if("2".equals(resetPassword.getUserType())){
-            SysUser user = new SysUser();
-            user.setUserId(resetPassword.getUserId());
-            String password = DigestUtils.md5DigestAsHex("666666".getBytes());
-            user.setPassword(password);
-            sysUserService.updateById(user);
-            return ResultUtils.success("密码重置成功!");
-        }else{
-            return ResultUtils.error("用户类型错误!");
+            return ResultUtils.success("密码重置成功");
+        }else if(resetPassword.getUserType().equals("2")){ //员工
+            SysUser sysUser = new SysUser();
+            sysUser.setUserId(resetPassword.getUserId());
+            //String password = DigestUtils.md5DigestAsHex("666666".getBytes());
+            sysUser.setPassword(passwordEncoder.encode("666666"));
+            sysUserService.updateById(sysUser);
+            return ResultUtils.success("密码重置成功");
+        }else{ // 用户类型错误
+            return ResultUtils.error("用户类型错误");
         }
     }
 
     //修改密码
     @PostMapping("/updatePassword")
-    public ResultVo updatePassword(@RequestBody ResetPassword resetPassword) {
-        if ("1".equals(resetPassword.getUserType())) {//会员
-            //验证原密码是否正确
+    public ResultVo updatePassword(@RequestBody ResetPassword resetPassword){
+        if(resetPassword.getUserType().equals("1")){ //会员
+            //验证原始密码是否正确
             Member member1 = memberService.getById(resetPassword.getUserId());
-            if (!member1.getPassword().equals(resetPassword.getOldPassword())) {
-                return ResultUtils.error("原密码不正确!");
+           /* if(!member1.getPassword().equals(resetPassword.getOldPassword())){
+                return ResultUtils.error("原密码不正确");
+            }*/
+            String dbPassword= member1.getPassword();
+            if(!passwordEncoder.matches(resetPassword.getOldPassword(),dbPassword)){
+                return ResultUtils.error("原密码不正确");
             }
-            //修改
+            //执行修改密码的操作
             Member member = new Member();
             member.setMemberId(resetPassword.getUserId());
-            member.setPassword(resetPassword.getPassword());
+            //member.setPassword(resetPassword.getPassword());
+            member.setPassword(passwordEncoder.encode(resetPassword.getPassword()));
             memberService.updateById(member);
-            return ResultUtils.success("修改密码成功!");
-        } else if ("2".equals(resetPassword.getUserType())) {//员工
-            //验证原密码
+            return ResultUtils.success("修改密码成功");
+        }else if(resetPassword.getUserType().equals("2")){ //员工
+            //验证原来的密码
             SysUser sysUser = sysUserService.getById(resetPassword.getUserId());
             String oldPas = DigestUtils.md5DigestAsHex(resetPassword.getOldPassword().getBytes());
-            if(!oldPas.equals(sysUser.getPassword())){
-                return ResultUtils.error("原密码不正确!");
+            /*if(!oldPas.equals(sysUser.getPassword())){
+                return ResultUtils.error("原密码不正确");
+            }*/
+            String dbPassword = sysUser.getPassword();
+            if(!passwordEncoder.matches(resetPassword.getOldPassword(), dbPassword)){
+                return ResultUtils.error("原密码不正确");
             }
             SysUser user = new SysUser();
             user.setUserId(resetPassword.getUserId());
-            String password = DigestUtils.md5DigestAsHex(resetPassword.getPassword().getBytes());
-            user.setPassword(password);
+            //String password = DigestUtils.md5DigestAsHex(resetPassword.getPassword().getBytes());
+            user.setPassword(passwordEncoder.encode(resetPassword.getPassword()));
             sysUserService.updateById(user);
-            return ResultUtils.success("修改密码成功!");
-        } else {
-            return ResultUtils.error("用户类型错误!");
+            return ResultUtils.success("修改密码成功");
+        }else{ // 用户类型错误
+            return ResultUtils.error("用户类型错误");
         }
+    }
+
+    //退出登录
+    @PostMapping("loginOut")
+    public ResultVo loginOut(HttpServletRequest request, HttpServletResponse response){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication != null){
+            new SecurityContextLogoutHandler().logout(request,response,authentication);
+        }
+        return new ResultUtils().success("退出登录成功");
     }
 }

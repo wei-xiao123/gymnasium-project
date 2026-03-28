@@ -88,8 +88,7 @@ const show = (type: string, row?: AddRoleModel) => {
       global.$objCopy(row, addModel);
     });
   }
-  //区分是新增还是编辑
-  addModel.type = type;
+  //重置表单
   dialog.visible = true;
   addFormRef.value?.resetFields();
 };

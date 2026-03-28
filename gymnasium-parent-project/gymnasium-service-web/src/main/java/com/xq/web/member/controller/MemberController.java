@@ -15,6 +15,7 @@ import com.xq.web.member_role.entity.MemberRole;
 import com.xq.web.member_role.service.MemberRoleService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -30,14 +31,22 @@ public class MemberController {
     @Autowired
     MemberCardService memberCardService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     //新增
     @PostMapping
     public ResultVo add(@RequestBody Member member){
-        if(memberService.save(member)){
-            return ResultUtils.success("新增成功!");
+        //判断卡号是否重复
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        query.lambda().eq(Member::getUsername,member.getUsername());
+        Member one = memberService.getOne(query);
+        if(one != null){
+            return ResultUtils.error("会员卡号被占用！");
         }
-        return ResultUtils.error("新增失败!");
+        member.setPassword(passwordEncoder.encode(member.getPassword()));
+        memberService.addMember(member);
+        return ResultUtils.success("新增成功！");
     }
 
     //修改会员

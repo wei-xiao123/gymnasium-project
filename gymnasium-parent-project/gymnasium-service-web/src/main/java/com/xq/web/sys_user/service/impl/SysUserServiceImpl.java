@@ -31,4 +31,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         return this.baseMapper.selectPage(page,query);
     }
 
+    //根据员工名称查询员工信息
+    @Override
+    public SysUser loadUser(String username) {
+        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        query.lambda().eq(SysUser::getUsername,username);
+        return this.baseMapper.selectOne(query);
+    }
+
 }

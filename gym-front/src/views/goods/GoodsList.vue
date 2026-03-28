@@ -11,7 +11,6 @@
           >重置</el-button
         >
         <el-button
-          v-permission="['sys:goodsList:add']"
           :icon="Plus"
           type="primary"
           @click="addBtn"
@@ -37,7 +36,6 @@
       <el-table-column label="操作" align="center" width="220">
         <template #default="scope">
           <el-button
-            v-permission="['sys:goodsList:edit']"
             type="primary"
             :icon="Edit"
             size="default"
@@ -45,7 +43,6 @@
             >编辑</el-button
           >
           <el-button
-            v-permission="['sys:goodsList:delete']"
             type="danger"
             :icon="Delete"
             size="default"
@@ -59,14 +56,13 @@
     <el-pagination
       @size-change="sizeChange"
       @current-change="currentChange"
-      :current-page.sync="listParam.currentPage"
+      v-model:current-page="listParam.currentPage"
       :page-sizes="[10, 20, 40, 80, 100]"
-      :page-size="listParam.pageSize"
+      v-model:page-size="listParam.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="listParam.total"
       background
-    >
-    </el-pagination>
+    ></el-pagination>
 
     <!-- 新增弹框 -->
     <AddGoods ref="addRef" @reFresh="reFresh"></AddGoods>

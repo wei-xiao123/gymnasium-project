@@ -139,5 +139,12 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
             this.baseMapper.addMoney(param);
         }
     }
+    //根据会员名称查询会员信息
+    @Override
+    public Member loadUser(String username) {
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        query.lambda().eq(Member::getUsername,username);
+        return this.baseMapper.selectOne(query);
+    }
 
 }

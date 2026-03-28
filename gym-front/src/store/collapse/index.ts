@@ -1,19 +1,20 @@
-import { defineStore } from 'pinia'
-//定义store
+import { defineStore } from 'pinia';
+
+// Define collapse store
 export const collapseStore = defineStore('collapseStore', {
-    state:()=>{
-        return {
-            collapse: 0
-        }
+  state: () => {
+    return {
+      collapse: false,
+    };
+  },
+  getters: {
+    getCollapse(state) {
+      return state.collapse;
     },
-    getters:{
-        getCollapse(state){
-            return state.collapse
-        }
+  },
+  actions: {
+    setCollapse(collapse: boolean) {
+      this.collapse = collapse;
     },
-    actions:{
-        setCollapse(collapse:number){
-            this.collapse = collapse
-        }
-    }
-})
+  },
+});

@@ -1,7 +1,7 @@
 <template>
   <menu-logo :isCollapsed="isCollapse"></menu-logo>
   <el-menu
-    :collapse="isCollapse"
+    :collapse="colstore.getCollapse"
     :default-active="activeIndex"
     class="el-menu-vertical-demo"
     unique-opened

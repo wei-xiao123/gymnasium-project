@@ -22,15 +22,18 @@ export default function useTable(){
     )
 
     //列表查询
-    const getList = async () =>{
-        let res = await getListApi(listParam)
-        if( res && res.code == 200){
-            console.log(res)
-            //设置表格的数据
-            tableList.list = res.data.records
-            //设置总记录
-            listParam.total = res.data.total
-
+    const getList = async () => {
+        try {
+            let res = await getListApi(listParam)
+            if(res && res.code === 200){
+                //设置表格的数据
+                tableList.list = res.data.records || []
+                //设置总记录
+                listParam.total = res.data.total || 0
+            }
+        } catch (error) {
+            console.error('Failed to fetch role list:', error)
+            tableList.list = []
         }
     }
 

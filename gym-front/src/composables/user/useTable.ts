@@ -22,12 +22,17 @@ export default function useTable(){
 
     //定义查询列表的方法
     const getList = async()=>{
-        let res = await getListApi(listParam)
-        if(res && res.code == 200){
-            //设置表格中的数据
-            tableList.list = res.data.records
-            //设置分页总条数
-            listParam.total = res.data.total
+        try {
+            let res = await getListApi(listParam)
+            if(res && res.code === 200){
+                //设置表格中的数据
+                tableList.list = res.data.records || []
+                //设置分页总条数
+                listParam.total = res.data.total || 0
+            }
+        } catch (error) {
+            console.error('Failed to fetch user list:', error)
+            tableList.list = []
         }
     }
 
@@ -51,7 +56,7 @@ export default function useTable(){
 
     //页码改变时触发
     const currentChange = (page:number)=>{
-        listParam.pageSize = page
+        listParam.currentPage = page
         getList()
     }
     //刷新列表

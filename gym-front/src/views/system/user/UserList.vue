@@ -14,7 +14,7 @@
       <el-form-item>
         <el-button @click="searchBtn" :icon="Search">搜索</el-button>
         <el-button @click="resetBtn" type="danger" plain :icon="Close">重置</el-button>
-        <el-button v-permission="['sys:user:add']" type="primary" @click="addBtn" :icon="Plus">新增</el-button>
+        <el-button type="primary" @click="addBtn" :icon="Plus">新增</el-button>
       </el-form-item>
     </el-form>
     <!-- 表格 -->
@@ -54,12 +54,13 @@
     <el-pagination
       @size-change="sizeChange"
       @current-change="currentChange"
-      :current-page.sync="listParam.currentPage"
-      :page-sizes="[10,20, 40, 80, 100]"
-      :page-size="listParam.pageSize"
+      v-model:current-page="listParam.currentPage"
+      :page-sizes="[10, 20, 40, 80, 100]"
+      v-model:page-size="listParam.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="listParam.total" background>
-    </el-pagination>
+      :total="listParam.total"
+      background
+    ></el-pagination>
     
     <!-- 新增、编辑弹框 -->
     <add-user ref="addRef" @refresh="refresh"></add-user>
@@ -71,10 +72,12 @@ import AddUser from "./AddUser.vue";
 import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue";
 import useTable from "@/composables/user/useTable";
 import useUser from "@/composables/user/useUser";
-//表格
-const { listParam, getList,searchBtn,resetBtn,tableList,sizeChange,currentChange,tableHeight,refresh } = useTable();
-//新增、编辑
-const { addBtn, editBtn, deleteBtn,resetPasBtn,addRef } = useUser(getList);
+
+// Table
+const { listParam, getList, searchBtn, resetBtn, tableList, sizeChange, currentChange, tableHeight, refresh } = useTable();
+
+// New/Edit
+const { addBtn, editBtn, deleteBtn, resetPasBtn, addRef } = useUser(getList);
 </script>
 
 

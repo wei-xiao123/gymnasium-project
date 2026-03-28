@@ -10,4 +10,5 @@ public interface SysUserService extends IService<SysUser> {
 
     IPage<SysUser> list(PageParam param);
 
+    SysUser loadUser(String username);
 }

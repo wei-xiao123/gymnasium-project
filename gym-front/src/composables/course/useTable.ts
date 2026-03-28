@@ -22,10 +22,15 @@ export default function useTable(){
 
     //查询列表
     const getList = async ()=>{
-        let res = await listApi(listParam)
-        if(res && res.code == 200){
-            tableData.list = res.data.records;
-            listParam.total = res.data.total;
+        try {
+            let res = await listApi(listParam)
+            if(res && res.code === 200){
+                tableData.list = res.data.records || []
+                listParam.total = res.data.total || 0
+            }
+        } catch (error) {
+            console.error('Failed to fetch course list:', error)
+            tableData.list = []
         }
     }
     //页面容量改变时触发

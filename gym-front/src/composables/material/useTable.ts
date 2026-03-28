@@ -19,10 +19,15 @@ export default function useTable(){
 
     //获取表格数据
     const getList = async ()=>{
-        let res = await getListApi(listParam)
-        if(res && res.code == 200){
-            tableData.list = res.data.records
-            listParam.total = res.data.total
+        try {
+            let res = await getListApi(listParam)
+            if(res && res.code === 200){
+                tableData.list = res.data.records || []
+                listParam.total = res.data.total || 0
+            }
+        } catch (error) {
+            console.error('Failed to fetch material list:', error)
+            tableData.list = []
         }
     }
 
@@ -64,6 +69,7 @@ export default function useTable(){
         searchBtn,
         resetBtn,
         tableData,
+        getList,
         sizeChange,
         currentChange,
         tableHeight,

@@ -1,8 +1,8 @@
 import * as Axios from "axios";
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosRequestHeaders } from "axios";
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosRequestHeaders, InternalAxiosRequestConfig } from "axios";
 const axios = Axios.default;
 import { ElMessage } from 'element-plus';
-import { userStore } from '@/store/user'
+import { userStore } from '@/store/user';
 
 //axios请求配置
 const config = {
@@ -30,10 +30,11 @@ class Http {
     //拦截器
     private interceptors() {
         //axios发送请求之前的处理
-        this.instance.interceptors.request.use((config: AxiosRequestConfig) => {
+        this.instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
             //在请求头部携带token
             // let token = sessionStorage.getItem('token');
             //let token = 'eyJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NzE5ODMwMzksInN1YiI6ImFkbWluIiwiaWF0IjoxNjUzOTgzMDM5NTQzfQ.Ai_Lcq0tE7-GurWqjng86gGn_WWVWN9jOx6yHeueP9nqxDDWft_h5SeopsQIiUewYbZvCiKSJKUP_E8bMRdWxw';
+            
             const store = userStore()
             let token = store.getToken;
             if (token) {

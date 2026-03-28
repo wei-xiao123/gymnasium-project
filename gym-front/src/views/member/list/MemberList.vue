@@ -106,14 +106,13 @@
     <el-pagination
       @size-change="sizeChange"
       @current-change="currentChange"
-      :current-page.sync="listParam.currentPage"
+      v-model:current-page="listParam.currentPage"
       :page-sizes="[10, 20, 40, 80, 100]"
-      :page-size="listParam.pageSize"
+      v-model:page-size="listParam.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
       :total="listParam.total"
       background
-    >
-    </el-pagination>
+    ></el-pagination>
     <!-- 新增、编辑 -->
     <AddMember ref="addRef" @refresh="refresh"></AddMember>
     <!-- 办卡弹框 -->

@@ -84,15 +84,15 @@
   </el-main>
 </template>
 <script setup lang="ts">
-import AddCourse from "./AddCourse.vue"
-import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue"
-import useTable from "../../composables/course/useTable"
-import useCourse from "../../composables/course/useCourse"
+import AddCourse from "./AddCourse.vue";
+import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue";
+import useTable from "../../composables/course/useTable";
+import useCourse from "../../composables/course/useCourse";
 
-// 表格相关
-const { listParam, tableData, getList, sizeChange, currentChange, tableHeight, searchBtn, resetBtn, reFresh } = useTable()
+// Table
+const { listParam, tableData, getList, sizeChange, currentChange, tableHeight, searchBtn, resetBtn, reFresh } = useTable();
 
-// 新增、编辑
-const { addBtn, editBtn, deleteBtn, addRef, joinBtn } = useCourse(getList)
+// Add/Edit/Delete
+const { addBtn, editBtn, deleteBtn, addRef, joinBtn } = useCourse(getList);
 </script>
 <style scoped></style>

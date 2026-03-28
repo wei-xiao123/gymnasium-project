@@ -19,6 +19,11 @@ import com.xq.web.sys_user.entity.SysUser;
 import com.xq.web.sys_user.service.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import sun.misc.BASE64Encoder;
@@ -82,6 +87,7 @@ public class LoginController {
     @Autowired
     SysMenuService sysMenuService;
 
+    /*
     //登录
     @PostMapping("/login")
     public ResultVo login(HttpServletRequest request, @RequestBody LoginParam loginParam){
@@ -146,6 +152,75 @@ public class LoginController {
             return ResultUtils.error("用户类型错误!");
         }
     }
+     */
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    AuthenticationManager authenticationManager;
+    @PostMapping("/login")
+    public ResultVo login(HttpServletRequest request, @RequestBody LoginParam param) {
+        if(StringUtils.isEmpty(param.getUsername()) ||
+                StringUtils.isEmpty(param.getPassword()) ||
+                StringUtils.isEmpty(param.getUserType()) ||
+                StringUtils.isEmpty(param.getCode())){
+
+            return ResultUtils.error("用户名、密码、验证码或用户类型不能为空!");
+
+        }
+        //获取sessoin
+        HttpSession session = request.getSession();
+        //获取验证码
+        String code = (String) session.getAttribute("code");
+        if(StringUtils.isEmpty(code)){
+            return ResultUtils.error("验证码过期!");
+        }
+        //验证验证码
+        if (!code.equals(param.getCode())) {
+            return ResultUtils.error("验证码错误!");
+        }
+        DigestUtils.md5DigestAsHex(param.getPassword().getBytes());
+        String password = passwordEncoder.encode(param.getPassword());
+        //构造spring security需要的token
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(param.getUsername()+":"+param.getUserType(),param.getPassword());
+        Authentication authenticate = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        //用户类型判断
+        if ("1".equals(param.getUserType())) { //会员
+            Member user = (Member)authenticate.getPrincipal();
+            //生成token
+            Map<String, String> map = new HashMap<>();
+            map.put("userId", Long.toString(user.getMemberId()));
+            map.put("username", user.getUsername());
+            map.put("userType", param.getUserType());
+            String token = jwtUtils.generateToken(map);
+            //返回登录成功信息
+            LoginResult result = new LoginResult();
+            result.setToken(token);
+            result.setUserId(user.getMemberId());
+            result.setUsername(user.getName());
+            result.setUserType(param.getUserType());
+            return ResultUtils.success("登录成功", result);
+        } else if ("2".equals(param.getUserType())) { //员工
+            SysUser user = (SysUser)authenticate.getPrincipal();
+            //生成token
+            Map<String, String> map = new HashMap<>();
+            map.put("userId", Long.toString(user.getUserId()));
+            map.put("username", user.getUsername());
+            map.put("userType", param.getUserType());
+            String token = jwtUtils.generateToken(map);
+            //返回登录成功信息
+            LoginResult result = new LoginResult();
+            result.setToken(token);
+            result.setUserId(user.getUserId());
+            result.setUsername(user.getNickName());
+            result.setUserType(param.getUserType());
+            return ResultUtils.success("登录成功", result);
+        } else {
+            return ResultUtils.error("用户类型错误!");
+        }
+    }
+
+
 
     //查询用户信息
     @GetMapping("/getInfo")

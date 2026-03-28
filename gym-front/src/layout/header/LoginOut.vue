@@ -45,7 +45,7 @@ import { reactive, ref } from "vue";
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
 import useInstance from "@/hooks/useInstance";
-import { updatePasswordApi } from "@/api/home";
+import { updatePasswordApi ,logiOutApi} from "@/api/home";
 import { userStore } from "@/store/user";
 
 const { dialog, onClose, onConfirm, onShow } = useDialog();
@@ -57,11 +57,14 @@ const store = userStore();
 const loginOut = async () => {
   const confirm = await global.$myconfirm("确定退出登录吗？");
   if (confirm) {
-    store.setToken("");
-    store.setUserId("");
-    store.setUserType("");
-    localStorage.clear();
-    window.location.href = "/login";
+    let res = await logiOutApi();
+    if (res && res.code === 200) {
+        store.setToken("");
+        store.setUserId("");
+        store.setUserType("");
+        localStorage.clear();
+        window.location.href = "/login";
+        }
   }
 };
 

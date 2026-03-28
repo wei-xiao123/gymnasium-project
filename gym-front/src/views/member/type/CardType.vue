@@ -10,7 +10,7 @@
         <el-button :icon="Close" type="danger" plain @click="resetBtn"
           >重置</el-button
         >
-        <el-button v-permission="['sys:memberRoot:add']" :icon="Plus" type="primary" @click="addBtn"
+        <el-button :icon="Plus" type="primary" @click="addBtn"
           >新增</el-button
         >
       </el-form-item>
@@ -42,8 +42,8 @@
       </el-table-column>
       <el-table-column  label="操作" align="center" width="220">
         <template #default="scope">
-          <el-button v-permission="['sys:memberRoot:edit']" type="primary" :icon="Edit" size="default" @click="editBtn(scope.row)">编辑</el-button>
-          <el-button v-permission="['sys:memberRoot:delete']" type="danger" :icon="Delete" size="default" @click="deleteBtn(scope.row)">删除</el-button>
+          <el-button type="primary" :icon="Edit" size="default" @click="editBtn(scope.row)">编辑</el-button>
+          <el-button type="danger" :icon="Delete" size="default" @click="deleteBtn(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,12 +51,13 @@
     <el-pagination
       @size-change="sizeChange"
       @current-change="currentChange"
-      :current-page.sync="listParam.currentPage"
-      :page-sizes="[10,20, 40, 80, 100]"
-      :page-size="listParam.pageSize"
+      v-model:current-page="listParam.currentPage"
+      :page-sizes="[10, 20, 40, 80, 100]"
+      v-model:page-size="listParam.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="listParam.total" background>
-    </el-pagination>
+      :total="listParam.total"
+      background
+    ></el-pagination>
     
     <!-- 新增、编辑 -->
     <AddCard ref="addRef" @refresh="refresh"></AddCard>

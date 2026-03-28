@@ -41,12 +41,13 @@
       <el-pagination
         @size-change="sizeChange"
         @current-change="currentChange"
-        :current-page.sync="listParam.currentPage"
-        :page-sizes="[10,20, 40, 80, 100]"
-        :page-size="listParam.pageSize"
+        v-model:current-page="listParam.currentPage"
+        :page-sizes="[10, 20, 40, 80, 100]"
+        v-model:page-size="listParam.pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="listParam.total" background>
-      </el-pagination>
+        :total="listParam.total"
+        background
+      ></el-pagination>
       
       <!-- 新增、编辑 -->
       <AddMaterial ref="addRef" @reFresh="reFresh"></AddMaterial>
@@ -58,10 +59,12 @@
   import { Plus, Edit, Delete, Search, Close } from "@element-plus/icons-vue";
   import useTable from "@/composables/material/useTable";
   import useMaterial from "@/composables/material/useMaterial";
-  //表格
-  const { listParam ,searchBtn,resetBtn,tableData,sizeChange,currentChange,tableHeight,reFresh} = useTable();
-  //新增、编辑
-  const {addBtn,editBtn,deleteBtn,addRef} = useMaterial()
+
+  // Table
+  const { listParam, searchBtn, resetBtn, tableData, getList, sizeChange, currentChange, tableHeight, reFresh } = useTable();
+
+  // Add/Edit/Delete
+  const { addBtn, editBtn, deleteBtn, addRef } = useMaterial(getList);
   </script>
   
   <style scoped></style>

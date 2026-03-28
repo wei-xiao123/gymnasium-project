@@ -12,13 +12,13 @@ import com.xq.web.sys_user_role.entity.SysUserRole;
 import com.xq.web.sys_user_role.service.SysUserRoleService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -30,6 +30,8 @@ public class SysUserController {
     @Autowired
     private SysUserRoleService sysUserRoleService;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     //新增员工
     @PostMapping
@@ -42,9 +44,10 @@ public class SysUserController {
             return ResultUtils.error("用户名已经存在!");
         }
         //密码加密
-        if(StringUtils.isNotEmpty(sysUser.getPassword())){
+        /*if(StringUtils.isNotEmpty(sysUser.getPassword())){
             sysUser.setPassword(DigestUtils.md5DigestAsHex(sysUser.getPassword().getBytes()));
-        }
+        }*/
+        sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));
         sysUser.setIsAdmin("0");
         sysUser.setCreateTime(new Date());
         //存储到数据库中
@@ -108,40 +111,15 @@ public class SysUserController {
         return ResultUtils.success("查询成功",one);
     }
 
-    //重置密码
-    @PostMapping("/resetPassword")
-    public ResultVo resetPassword(@RequestBody Map<String, Object> param){
-        Long userId = Long.parseLong(param.get("userId").toString());
-        String newPassword = param.get("newPassword").toString();
-
-        // 获取用户
-        SysUser user = sysUserService.getById(userId);
-        if(user == null){
-            return ResultUtils.error("用户不存在");
-        }
-
-        // 密码加密
-        String encryptPassword = DigestUtils.md5DigestAsHex(newPassword.getBytes());
-        user.setPassword(encryptPassword);
-        user.setUpdateTime(new Date());
-
-        // 更新数据库
-        boolean update = sysUserService.updateById(user);
-        if(update){
-            return ResultUtils.success("重置密码成功");
-        }
-        return ResultUtils.error("重置密码失败");
-    }
-
-    //查询课程教练
-    @GetMapping("/getTeacher")
+    //查询课程教师
+    @GetMapping("getTeacher")
     public ResultVo getTeacher(){
         QueryWrapper<SysUser> query = new QueryWrapper<>();
         query.lambda().eq(SysUser::getUserType,"2");
         List<SysUser> list = sysUserService.list(query);
-        //组装后的select数据
+        //组装数据
         List<SelectType> selectTypeList = new ArrayList<>();
-        if(list.size() >0){
+        if(list.size() > 0){
             list.stream().forEach(item ->{
                 SelectType selectType = new SelectType();
                 selectType.setLabel(item.getNickName());
@@ -151,5 +129,4 @@ public class SysUserController {
         }
         return ResultUtils.success("查询成功",selectTypeList);
     }
-
 }

@@ -3,7 +3,6 @@
     <!--新增 -->
     <div style="display: flex; align-items: center">
       <el-button
-        v-permission="['sys:menu:add']"
         style="margin-bottom: 10px"
         type="primary"
         :icon="Plus"
@@ -49,7 +48,6 @@
       <el-table-column label="操作" width="220" align="center">
         <template #default="scope">
           <el-button
-          v-permission="['sys:menu:edit']"
             type="success"
             :icon="Edit"
             size="default"
@@ -57,7 +55,6 @@
             >编辑</el-button
           >
           <el-button
-          v-permission="['sys:menu:delete']"
             type="danger"
             :icon="Delete"
             size="default"
