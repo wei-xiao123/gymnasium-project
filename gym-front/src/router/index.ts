@@ -154,7 +154,7 @@ export const constantRoutes: Array<RouteRecordRaw> = [
       },
       {
         path: "/mycourse",
-        component: () => import("@/views/mycourse/mycourse.vue"),
+        component: () => import("@/views/mycourse/MyCourse.vue"),
         name: "mycourse",
         meta: {
           title: "我的课程",

@@ -6,7 +6,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/gymnasium?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf8
+    url: jdbc:mysql://localhost:3306/gymnasium?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf8&allowPublicKeyRetrieval=true
     username: root
     password: root
 
@@ -30,6 +30,10 @@ jwt:
   issuer: weixiao  #颁发者
   secret: wxlk    #秘钥
   expiration: 30    #30分钟过期
+
+#不需要token验证的请求，逗号分隔配置
+ignore:
+  url: /api/login/login,/api/login/image
 
 # 定义日志文件的输出格式
 logging:
