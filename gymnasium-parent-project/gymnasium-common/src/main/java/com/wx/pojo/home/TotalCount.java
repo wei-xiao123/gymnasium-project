@@ -1,0 +1,14 @@
+package com.wx.pojo.home;
+
+import lombok.Data;
+import java.io.Serializable;
+
+@Data
+public class TotalCount implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private int memberCount; //会员总数
+    private int userCount; //员工总数
+    private int materCount; //器材总数
+    private int orderCount; //订单总数
+}

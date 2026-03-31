@@ -8,9 +8,16 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8080,
-    strictPort: true,
+    strictPort: false,
     hmr: true,
-    open: false
+    open: false,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8088',
+        changeOrigin: true,
+        rewrite: (path) => path
+      }
+    }
   },
   resolve: {
     alias: {

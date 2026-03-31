@@ -1,7 +1,17 @@
-#端口号配置
 server:
-  port: 8089
-#数据库连接配置
+  port: 8088
+dubbo:
+  application:
+    name: gymnasium-service-user # 建议与模块名保持一致
+  registry:
+    #nacos 协议和端口
+    address: nacos://127.0.0.1:8848
+  protocol:
+    name: dubbo
+    port: 20880
+  scan:
+    base-packages: com.wx.service.impl
+# 数据库相关的配置
 spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
@@ -9,22 +19,23 @@ spring:
     url: jdbc:mysql://localhost:3306/gymnasium?serverTimezone=GMT%2B8&useSSL=false&characterEncoding=utf8&allowPublicKeyRetrieval=true
     username: root
     password: root
-
   servlet:
     multipart:
-      max-file-size: 200MB #设置单个文件的大小 因为springboot内置tomact的的文件传输默认为10MB
-      max-request-size: 500MB #设置单次请求的文件总大小
-      enabled: true #设置该参数，否则不生效
-
-#mybatis plus配置
+      max-file-size: 200MB  #设置单个文件的大小  因为springboot内置tomact的的文件传输默认为10MB
+      max-request-size: 500MB   #设置单次请求的文件总大小
+      enabled: true
+# minio配置
+minio:
+  endpoint: http://127.0.0.1:9000
+  accesskey: minioadmin
+  secretKey: minioadmin
+# mybatis-plus的配置
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # 将相关的日志信息输出到控制台
   global-config:
     db-config:
-      #配置mybatis plus 在更新时只更新非空和非NULL的字段
-      update-strategy: not_empty
-
+      update-strategy: not_empty  # 在更新操作的时候，只更新非空和非NULL的字段
 #jwt配置
 jwt:
   issuer: weixiao  #颁发者
@@ -39,9 +50,3 @@ ignore:
 logging:
   pattern:
     console: '%d{yyyy-MM-dd} [%thread] %-5level %logger- %msg%n'
-
-# minio配置
-minio:
-  endpoint: http://127.0.0.1:9000
-  accesskey: minioadmin
-  secretKey: minioadmin

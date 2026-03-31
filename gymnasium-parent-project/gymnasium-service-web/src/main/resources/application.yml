@@ -1,6 +1,14 @@
 spring:
   profiles:
     active: dev
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
+dubbo:
+  application:
+    name: gymnasium-service-web  # 应用名
+  registry:
+    address: nacos://127.0.0.1:8848  # Nacos 地址
+  protocol:
+    name: dubbo
+    port: 20880  # Web模块的Dubbo协议端口，确保不冲突
+  consumer:
+    check: false  # 防止某个微服务掉线导致Web层无法启动
+    proxy: jdk  # 显式指定代理方式为 jdk
