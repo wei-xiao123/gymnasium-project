@@ -3,6 +3,7 @@ server:
 dubbo:
   application:
     name: gymnasium-service-course # 建议与模块名保持一致
+    metadata-type: local
   registry:
     #nacos 协议和端口
     address: nacos://127.0.0.1:8848
