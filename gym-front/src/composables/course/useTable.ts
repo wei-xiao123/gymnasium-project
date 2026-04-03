@@ -1,6 +1,7 @@
 import { listApi } from "@/api/course"
 import type { CourseListParam } from "@/api/course/CourseModel"
 import { nextTick, onMounted, reactive,ref } from "vue"
+import { normalizeImageUrl } from "@/utils/imageUrl"
 
 export default function useTable(){
 
@@ -25,7 +26,11 @@ export default function useTable(){
         try {
             let res = await listApi(listParam)
             if(res && res.code === 200){
-                tableData.list = res.data.records || []
+                const records = res.data?.records || []
+                tableData.list = records.map((item: any) => ({
+                    ...item,
+                    image: normalizeImageUrl(item.image)
+                }))
                 listParam.total = res.data.total || 0
             }
         } catch (error) {

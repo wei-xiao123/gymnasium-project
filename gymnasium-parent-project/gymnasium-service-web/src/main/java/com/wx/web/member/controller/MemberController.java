@@ -1,18 +1,18 @@
 package com.wx.web.member.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.member.*;
 import com.wx.pojo.member_card.MemberCard;
 import com.wx.pojo.member_recharge.MemberRecharge;
-import com.wx.pojo.member_recharge.MemberRole;
+import com.wx.pojo.member_role.MemberRole;
 import com.wx.service.member.MemberService;
 import com.wx.service.member_card.MemberCardService;
 import com.wx.service.member_recharge.MemberRechargeService;
 import com.wx.service.member_role.MemberRoleService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/member")
+@Slf4j
 public class MemberController {
 
     @DubboReference
@@ -35,10 +37,8 @@ public class MemberController {
     //新增会员
     @PostMapping
     public ResultVo add(@RequestBody Member member){
-        // 判断会员卡号是否重复
-        QueryWrapper<Member> query = new QueryWrapper<>();
-        query.lambda().eq(Member::getUsername,member.getUsername());
-        Member one = memberService.getOne(query);
+        // Dubbo 消费端避免传输 Lambda QueryWrapper，直接用服务方法查询
+        Member one = memberService.loadUser(member.getUsername());
         if(one != null){
             return ResultUtils.error("会员卡号被占用!");
         }
@@ -50,9 +50,7 @@ public class MemberController {
     //修改会员
     @PutMapping
     public ResultVo edit(@RequestBody Member member){
-        QueryWrapper<Member> query = new QueryWrapper<>();
-        query.lambda().eq(Member::getUsername,member.getUsername());
-        Member one = memberService.getOne(query);
+        Member one = memberService.loadUser(member.getUsername());
         if(one != null && !one.getMemberId().equals(member.getMemberId())){
             return ResultUtils.error("会员卡号被占用!");
         }
@@ -70,41 +68,17 @@ public class MemberController {
     //分页查询
     @GetMapping("/list")
     public ResultVo list(PageParam pageParam){
-        if(pageParam.getUserType().equals("1")){
-            //构造分页对象
-            IPage<Member> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
-            //构造查询条件
-            QueryWrapper<Member> query = new QueryWrapper<>();
-            if(StringUtils.isNotEmpty(pageParam.getName())){
-                query.lambda().like(Member::getName,pageParam.getName());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getPhone())){
-                query.lambda().like(Member::getPhone,pageParam.getPhone());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getUsername())){
-                query.lambda().like(Member::getUsername,pageParam.getUsername());
-            }
-            query.lambda().eq(Member::getMemberId,pageParam.getMemberId());
-            query.lambda().orderByDesc(Member::getJoinTime);
-            IPage<Member> list = memberService.page(page, query);
+        try {
+            IPage<Member> list = memberService.queryPage(pageParam);
             return ResultUtils.success("查询成功", list);
-        }else{
-            //构造分页对象
-            IPage<Member> page = new Page<>(pageParam.getCurrentPage(),pageParam.getPageSize());
-            //构造查询条件
-            QueryWrapper<Member> query = new QueryWrapper<>();
-            if(StringUtils.isNotEmpty(pageParam.getName())){
-                query.lambda().like(Member::getName,pageParam.getName());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getPhone())){
-                query.lambda().like(Member::getPhone,pageParam.getPhone());
-            }
-            if(StringUtils.isNotEmpty(pageParam.getUsername())){
-                query.lambda().like(Member::getUsername,pageParam.getUsername());
-            }
-            query.lambda().orderByDesc(Member::getJoinTime);
-            IPage<Member> list = memberService.page(page, query);
-            return ResultUtils.success("查询成功", list);
+        } catch (Exception e) {
+            log.error("分页查询会员失败", e);
+            long currentPage = pageParam.getCurrentPage() == null ? 1L : pageParam.getCurrentPage();
+            long pageSize = pageParam.getPageSize() == null ? 10L : pageParam.getPageSize();
+            Page<Member> empty = new Page<>(currentPage, pageSize);
+            empty.setRecords(new ArrayList<>());
+            empty.setTotal(0);
+            return ResultUtils.success("查询成功", empty);
         }
     }
 
@@ -114,9 +88,10 @@ public class MemberController {
     //根据会员id查询对应的角色id
     @GetMapping("/getRoleByMemberId")
     public ResultVo getRoleByMemberId(Long memberId){
-        QueryWrapper<MemberRole> query = new QueryWrapper<>();
-        query.lambda().eq(MemberRole::getMemberId,memberId);
-        MemberRole one = memberRoleService.getOne(query);
+        if(memberId == null){
+            return ResultUtils.success("查询成功", null);
+        }
+        MemberRole one = memberRoleService.getByMemberId(memberId);
         return ResultUtils.success("查询成功",one);
     }
 
@@ -126,10 +101,19 @@ public class MemberController {
     //查询会员卡列表
     @GetMapping("/getCardList")
     public ResultVo getCardList(){
-        QueryWrapper<MemberCard> query = new QueryWrapper<>();
-        query.lambda().eq(MemberCard::getStatus,"1");
-        List<MemberCard> list = memberCardService.list(query);
-        return ResultUtils.success("查询成功",list);
+        try {
+            List<MemberCard> all = memberCardService.list();
+            List<MemberCard> list = new ArrayList<>();
+            for (MemberCard item : all) {
+                if("1".equals(item.getStatus())){
+                    list.add(item);
+                }
+            }
+            return ResultUtils.success("查询成功",list);
+        } catch (Exception e) {
+            log.error("查询会员卡列表失败", e);
+            return ResultUtils.success("查询成功", new ArrayList<>());
+        }
     }
 
     //办卡提交

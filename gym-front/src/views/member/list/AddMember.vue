@@ -150,32 +150,7 @@ const addFormRef = ref<FormInstance>();
 const { roleData, listRole, roleMemberId, getMemberRole } = useSelectRole();
 //弹框属性
 const { dialog, onClose, onConfirm, onShow } = useDialog();
-//弹框显示
-const show = async(type: string, row?: MemberType) => {
-  await listRole()
-  await getMemberRole(row!?.memberId)
-  dialog.width = 720;
-  dialog.height = 350;
-  type == EditType.ADD
-    ? (dialog.title = Title.ADD)
-    : (dialog.title = Title.EDIT);
-  if (EditType.EDIT == type) {
-    nextTick(() => {
-      global.$objCopy(row, addModel);
-      addModel.roleId = roleMemberId.value
-      addModel.password = ''
-    });
-  }
-  addModel.type = type;
-  onShow();
-  addFormRef.value?.resetFields()
-};
-//暴露出去，给父组件调用
-defineExpose({
-  show,
-});
-//表单绑定的数据对象
-const addModel = reactive<MemberType>({
+const getDefaultModel = (): MemberType => ({
   type: "",
   memberId: "",
   name: "",
@@ -191,8 +166,37 @@ const addModel = reactive<MemberType>({
   username: "",
   password: "",
   status: "",
-  roleId:''
+  roleId: "",
 });
+//弹框显示
+const show = async(type: string, row?: MemberType) => {
+  await listRole()
+  dialog.width = 720;
+  dialog.height = 350;
+  type == EditType.ADD
+    ? (dialog.title = Title.ADD)
+    : (dialog.title = Title.EDIT);
+  Object.assign(addModel, getDefaultModel());
+  addModel.type = type;
+  if (EditType.EDIT == type) {
+    if (row?.memberId) {
+      await getMemberRole(row.memberId);
+    }
+    global.$objCopy(row, addModel);
+    addModel.roleId = roleMemberId.value;
+    addModel.password = "";
+  }
+  onShow();
+  nextTick(() => {
+    addFormRef.value?.clearValidate();
+  });
+};
+//暴露出去，给父组件调用
+defineExpose({
+  show,
+});
+//表单绑定的数据对象
+const addModel = reactive<MemberType>(getDefaultModel());
 //表单验证规则
 const rules = reactive({
   roleId:[

@@ -36,12 +36,43 @@ class Http {
             
             const store = userStore()
             let token = store.getToken;
+            // 兜底: 页面刷新后 store 尚未恢复时，从本地持久化中读取
+            if (!token) {
+                try {
+                    const localState = localStorage.getItem('userStore')
+                    if (localState) {
+                        const parsed = JSON.parse(localState)
+                        token = parsed?.token || parsed?.state?.token || ''
+                    }
+                } catch (e) {
+                    token = ''
+                }
+            }
+            if (!token) {
+                try {
+                    const sessionToken = sessionStorage.getItem('token')
+                    if (sessionToken) {
+                        token = sessionToken
+                    }
+                } catch (e) {
+                    token = ''
+                }
+            }
             if (token) {
                 config.headers!['token'] = token
+                // 后端过滤器支持从参数读取token，GET场景增加兜底
+                if ((config.method || '').toLowerCase() === 'get') {
+                    const oldParams = (config.params || {}) as Record<string, any>
+                    if (!oldParams.token) {
+                        config.params = {
+                            ...oldParams,
+                            token,
+                        }
+                    }
+                }
                 //把token放到headers里面
                 // (config.headers as AxiosRequestHeaders).token = token
             }
-            console.log(config)
             return config;
         }, (error: any) => {
             error.data = {}

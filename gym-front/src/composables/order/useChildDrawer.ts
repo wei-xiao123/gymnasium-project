@@ -2,6 +2,7 @@ import { onMounted, reactive, ref } from "vue";
 import type { GoodsParam, GoodsType, AddCar } from "@/api/goods/GoodsModel";
 import { listApi } from "@/api/goods";
 import { ElMessage } from "element-plus";
+import { normalizeImageUrl } from "@/utils/imageUrl";
 
 export default function useChildDrawer() {
   const innerDrawer = ref(false);
@@ -30,8 +31,12 @@ export default function useChildDrawer() {
   const getList = async () => {
     const res = await listApi(goodsParam);
     if (res && res.code === 200) {
-      tableList.list = res.data.records;
-      goodsParam.total = res.data.total;
+      const records = res.data?.records || res.data?.list || [];
+      tableList.list = records.map((item: any) => ({
+        ...item,
+        image: normalizeImageUrl(item.image),
+      }));
+      goodsParam.total = res.data?.total || 0;
     }
   };
 

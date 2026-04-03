@@ -10,7 +10,9 @@ export default function useEditor(){
     //上传图片的配置
     editorConfig.MENU_CONF!['uploadImage'] ={
         fieldName: 'file',
-        server: import.meta.env.VITE_BASE_API ? import.meta.env.VITE_BASE_API + '/api/upload/uploadImage' : 'http://localhost:8089/api/upload/uploadImage',
+        server: import.meta.env.VITE_BASE_API
+            ? import.meta.env.VITE_BASE_API + '/api/upload/uploadImage'
+            : '/api/upload/uploadImage',
         customInsert(res: any, insertFn: InsertFnType){
             console.log('图片上传的路径是:',res.data.msg)
             insertFn(res.data.msg) // res.data.msg 获取上传图片的url

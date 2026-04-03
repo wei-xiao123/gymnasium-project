@@ -13,9 +13,9 @@ export type CourseType = {
     courseName:string,
     image:string,
     teacherName:string,
-    courseHour:number,
+    courseHour:number | "",
     courseDetails:string,
-    coursePrice:number,
+    coursePrice:number | "",
     teacherId:string
 }
 

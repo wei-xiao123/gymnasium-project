@@ -1,8 +1,6 @@
 package com.wx.web.goods_order.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.goods.Goods;
 import com.wx.pojo.goods.GoodsParam;
 import com.wx.pojo.goods_order.GoodsOrder;
@@ -14,7 +12,6 @@ import com.wx.service.goods_order.GoodsOrderService;
 import com.wx.service.sys_user.SysUserService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -66,14 +63,7 @@ public class GoodsOrderController {
     //查询订单列表
     @GetMapping("/list")
     public ResultVo list(GoodsParam param){
-        //构造分页对象
-        IPage<GoodsOrder> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-        //构造查询条件
-        QueryWrapper<GoodsOrder> query = new QueryWrapper<>();
-        if(StringUtils.isNotEmpty(param.getName())){
-            query.lambda().like(GoodsOrder::getName,param.getName());
-        }
-        IPage<GoodsOrder> list = goodsOrderService.page(page,query);
+        IPage<GoodsOrder> list = goodsOrderService.queryPage(param);
         return ResultUtils.success("查询成功", list);
     }
 

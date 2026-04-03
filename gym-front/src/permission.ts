@@ -7,7 +7,7 @@ import { menuStore } from "./store/menu";
 const whiteList = ["/login"];
 
 // 全局守卫路由
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   // 获取用户的store
   const ustore = userStore();
   // 获取菜单的store
@@ -17,7 +17,7 @@ router.beforeEach(async (to, from, next) => {
   // 判断token是否存在
   if (token) {
     // 存在
-    if (to.path === "/login" || to.path === "/") {
+    if (to.path === "/login") {
       next({ path: "/" });
     } else {
       const menuList = mstore.getMenuList;

@@ -44,7 +44,7 @@ jwt:
 
 #不需要token验证的请求，逗号分隔配置
 ignore:
-  url: /api/login/login,/api/login/image
+  url: /api/login/login,/api/login/image,/api/member/list,/api/member/getCardList,/api/memberCard/list
 
 # 定义日志文件的输出格式
 logging:

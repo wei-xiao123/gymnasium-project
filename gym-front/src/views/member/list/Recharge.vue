@@ -50,11 +50,16 @@ defineExpose({
 const addModel = reactive<Recharge>({
   userId: "",
   memberId: "",
-  money: 0,
+  money: "",
 });
 const validMoney = (rule: any, value: any, callback: any) => {
-  if (value <= 0) {
-    callback(new Error("充值金额不能小于0"));
+  if (value === "" || value === null || value === undefined) {
+    callback(new Error("请填写充值金额"));
+    return;
+  }
+  const money = Number(value);
+  if (Number.isNaN(money) || money <= 0) {
+    callback(new Error("充值金额必须大于0"));
   } else {
     callback();
   }
@@ -76,7 +81,11 @@ const commit = () => {
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
       addModel.userId = store.getUserId
-      let res = await rechargeApi(addModel);
+      const submitData: Recharge = {
+        ...addModel,
+        money: Number(addModel.money),
+      };
+      let res = await rechargeApi(submitData);
       if (res && res.code == 200) {
         ElMessage.success(res.msg);
         emits("refresh");

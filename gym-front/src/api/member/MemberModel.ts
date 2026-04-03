@@ -37,7 +37,7 @@ export type ApplyCard = {
 //充值数据类型
 export type Recharge = {
     memberId:string,
-    money:number,
+    money:number | "",
     userId:string
 }
 

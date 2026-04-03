@@ -23,13 +23,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/api/home")
 @RestController
+@Slf4j
 public class HomeController {
 
     @DubboReference
@@ -62,10 +65,15 @@ public class HomeController {
     //查询反馈列表
     @GetMapping("/getSuggestList")
     public ResultVo getSuggestList(){
-        QueryWrapper<Suggest> query = new QueryWrapper<>();
-        query.lambda().orderByDesc(Suggest::getDateTime).last("limit 3");
-        List<Suggest> list = suggestService.list(query);
-        return ResultUtils.success("查询成功",list);
+        try {
+            QueryWrapper<Suggest> query = new QueryWrapper<>();
+            query.lambda().orderByDesc(Suggest::getDateTime).last("limit 3");
+            List<Suggest> list = suggestService.list(query);
+            return ResultUtils.success("查询成功",list);
+        } catch (Exception e) {
+            log.error("查询反馈列表失败", e);
+            return ResultUtils.success("查询成功", new ArrayList<>());
+        }
     }
 
     //查询热销商品

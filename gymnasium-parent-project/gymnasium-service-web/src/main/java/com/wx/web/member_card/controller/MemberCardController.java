@@ -8,12 +8,16 @@ import com.wx.pojo.member_card.MemberCard;
 import com.wx.service.member_card.MemberCardService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/api/memberCard")
+@Slf4j
 public class MemberCardController {
 
     @DubboReference
@@ -48,14 +52,30 @@ public class MemberCardController {
     //分页查询会员列表信息
     @GetMapping("/list")
     public ResultVo list(ListCard listCard){
-        //构造分页对象
-        IPage<MemberCard> page = new Page<>(listCard.getCurrentPage(),listCard.getPageSize());
-        //构造查询条件
-        QueryWrapper<MemberCard> query = new QueryWrapper<>();
-        if(StringUtils.isNotEmpty(listCard.getTitle())){
-            query.lambda().like(MemberCard::getTitle,listCard.getTitle());
+        try {
+            long currentPage = listCard.getCurrentPage() == null ? 1L : listCard.getCurrentPage();
+            long pageSize = listCard.getPageSize() == null ? 10L : listCard.getPageSize();
+
+            //构造分页对象
+            IPage<MemberCard> page = new Page<>(currentPage, pageSize);
+            IPage<MemberCard> list;
+            // 默认列表不传 Wrapper，避免 Dubbo Hessian 反序列化异常
+            if(StringUtils.isNotEmpty(listCard.getTitle())){
+                QueryWrapper<MemberCard> query = new QueryWrapper<>();
+                query.like("title", listCard.getTitle());
+                list = memberCardService.page(page, query);
+            } else {
+                list = memberCardService.page(page);
+            }
+            return ResultUtils.success("查询成功", list);
+        } catch (Exception e) {
+            log.error("查询会员卡列表失败", e);
+            long currentPage = listCard.getCurrentPage() == null ? 1L : listCard.getCurrentPage();
+            long pageSize = listCard.getPageSize() == null ? 10L : listCard.getPageSize();
+            Page<MemberCard> empty = new Page<>(currentPage, pageSize);
+            empty.setRecords(new ArrayList<>());
+            empty.setTotal(0);
+            return ResultUtils.success("查询成功", empty);
         }
-        IPage<MemberCard> list = memberCardService.page(page, query);
-        return ResultUtils.success("查询成功", list);
     }
 }

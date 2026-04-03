@@ -62,10 +62,11 @@
 <script setup lang="ts">
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { CardType } from "@/api/member_card/MemberModel";
+import type { CardType } from "@/api/member_card/MemberModel";
 import { nextTick, reactive, ref } from "vue";
 import { addApi,editApi } from "@/api/member_card/index";
-import { ElMessage, FormInstance } from "element-plus";
+import { ElMessage } from "element-plus";
+import type { FormInstance } from "element-plus";
 import { EditType, Title } from "@/type/BaseEnum";
 import useInstance from "@/hooks/useInstance";
 const { global } = useInstance();
@@ -73,20 +74,47 @@ const { global } = useInstance();
 const addFormRef = ref<FormInstance>();
 //弹框属性
 const { dialog, onClose, onConfirm, onShow } = useDialog();
+
+const defaultModel: CardType = {
+  type: "",
+  title: "",
+  cardType: "",
+  cardId: "",
+  price: "",
+  cardDay: "",
+  status: "",
+};
+
+const resetModel = () => {
+  Object.assign(addModel, defaultModel);
+};
+
 //显示弹框
 const show = (type: string, row?: CardType) => {
+  resetModel();
+  addModel.type = type;
+
   dialog.height = 200;
   type == EditType.ADD
     ? (dialog.title = Title.ADD)
     : (dialog.title = Title.EDIT);
+
+  onShow();
+
+  // 每次打开都清掉上次校验状态
+  nextTick(() => {
+    addFormRef.value?.clearValidate();
+    if (type == EditType.ADD) {
+      addFormRef.value?.resetFields();
+    }
+  });
+
   if (type == EditType.EDIT) {
     //把要编辑的数据复制到表单对象
     nextTick(() => {
       global.$objCopy(row, addModel);
     });
   }
-  addModel.type = type;
-  onShow();
 };
 //暴露出去，给父组件调用
 defineExpose({
@@ -94,13 +122,7 @@ defineExpose({
 });
 //表单数据
 const addModel = reactive<CardType>({
-  type: "",
-  title: "",
-  cardType: "",
-  cardId: "",
-  price: "",
-  cardDay: 0,
-  status: "",
+  ...defaultModel,
 });
 //表单验证规则
 const rules = reactive({

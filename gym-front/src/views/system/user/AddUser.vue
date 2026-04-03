@@ -126,7 +126,9 @@ const show = async (type: string, row?: AddUserModel) => {
   addModel.type = type;
   //获取角色数据
   await listRole();
-  await getRole(row!?.userId);
+  if (type == EditType.EDIT && row?.userId) {
+    await getRole(row.userId);
+  }
   type == EditType.ADD
     ? (dialog.title = Title.ADD)
     : (dialog.title = Title.EDIT);

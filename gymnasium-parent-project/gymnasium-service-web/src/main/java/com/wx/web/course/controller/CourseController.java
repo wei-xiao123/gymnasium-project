@@ -1,8 +1,6 @@
 package com.wx.web.course.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.course.Course;
 import com.wx.pojo.course.CourseList;
 import com.wx.pojo.course.PageParam;
@@ -13,7 +11,6 @@ import com.wx.service.member.MemberService;
 import com.wx.service.member_course.MemberCourseService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,17 +51,7 @@ public class CourseController {
     //课程列表查询
     @GetMapping("/list")
     public ResultVo list(CourseList courseList){
-        //构造分页对象
-        IPage<Course> page = new Page<>(courseList.getCurrentPage(),courseList.getPageSize());
-        //构造查询条件
-        QueryWrapper<Course> query = new QueryWrapper();
-        if(StringUtils.isNotEmpty(courseList.getCourseName())){
-            query.lambda().like(Course::getCourseName,courseList.getCourseName());
-        }
-        if(StringUtils.isNotEmpty(courseList.getTeacherName())){
-            query.lambda().like(Course::getTeacherName,courseList.getTeacherName());
-        }
-        IPage<Course> list = courseService.page(page,query);
+        IPage<Course> list = courseService.queryPage(courseList);
         return ResultUtils.success("查询成功", list);
     }
 
@@ -78,11 +65,8 @@ public class CourseController {
     @PostMapping("/joinCourse")
     public ResultVo joinCourse(@RequestBody MemberCourse memberCourse){
         //查询是否已经报名该课程
-        QueryWrapper<MemberCourse> query = new QueryWrapper<>();
-        query.lambda().eq(MemberCourse::getCourseId,memberCourse.getCourseId())
-                .eq(MemberCourse::getMemberId,memberCourse.getMemberId());
-        MemberCourse one = memberCourseService.getOne(query);
-        if(one != null){
+        boolean joined = memberCourseService.existsByCourseAndMember(memberCourse.getCourseId(), memberCourse.getMemberId());
+        if(joined){
             return ResultUtils.error("您已经报名过该课程");
         }
         //判断余额是否充足
@@ -99,18 +83,14 @@ public class CourseController {
     //查询我的课程列表
     @GetMapping("/getMyCourseList")
     public ResultVo getMyCourseList(PageParam param){
-        if(param.getUserType().equals("1")){
-            IPage<MemberCourse> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-            QueryWrapper<MemberCourse> query = new QueryWrapper<>();
-            query.lambda().eq(MemberCourse::getMemberId,param.getUserId());
-            IPage<MemberCourse> list = memberCourseService.page(page, query);
+        if("1".equals(param.getUserType())){
+            IPage<MemberCourse> list = memberCourseService.queryPageByMember(param);
             return ResultUtils.success("查询成功",list);
-        }else{
-            IPage<Course> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-            QueryWrapper<Course> query = new QueryWrapper<>();
-            query.lambda().eq(Course::getTeacherId,param.getUserId());
-            IPage<Course> list = courseService.page(page, query);
+        } else if ("2".equals(param.getUserType())) {
+            IPage<MemberCourse> list = memberCourseService.queryPageAll(param);
             return ResultUtils.success("查询成功",list);
         }
+        IPage<Course> list = courseService.queryPageByTeacher(param);
+        return ResultUtils.success("查询成功",list);
     }
 }

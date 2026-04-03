@@ -7,7 +7,33 @@ import {type InfoParam } from "@/api/login/LoginModel";
 
 //获取views下面的所有页面
 const modules = import.meta.glob('../../views/**/*.vue')
-console.log("modules",modules)
+
+const resolveViewComponent = (componentPath: string) => {
+    if (!componentPath) {
+        return null
+    }
+    const normalize = (p: string) => p.replace(/\\/g, '/').replace(/^\//, '').toLowerCase()
+    const target = normalize(componentPath)
+
+    // 精确匹配
+    const exactKey = `../../views/${componentPath.replace(/^\//, '')}.vue`
+    if (modules[exactKey]) {
+        return modules[exactKey]
+    }
+
+    // 忽略大小写匹配
+    const foundKey = Object.keys(modules).find((key) => normalize(key.replace('../../views/', '').replace('.vue', '')) === target)
+    if (foundKey) {
+        return modules[foundKey]
+    }
+
+    // 历史菜单兼容: /courseOrder 或 /course/Order -> /mycourse/MyCourse
+    if ((target === 'courseorder' || target === 'course/order') && modules['../../views/mycourse/MyCourse.vue']) {
+        return modules['../../views/mycourse/MyCourse.vue']
+    }
+
+    return null
+}
 //定义store
 export const menuStore = defineStore('menuStore', {
     state: () => {
@@ -69,7 +95,13 @@ export function generateRoutes(routes: RouteRecordRaw[], router: any) {
             if (component == 'Layout') {
                 tmp.component = Layout;
             } else {
-                tmp.component = modules[`../../views${component}.vue`]
+                const viewComponent = resolveViewComponent(component as string)
+                if (viewComponent) {
+                    tmp.component = viewComponent
+                } else {
+                    // 避免把字符串组件直接注入路由导致 Invalid route component
+                    delete tmp.component
+                }
             }
         }
         //如果存在下级
@@ -79,6 +111,11 @@ export function generateRoutes(routes: RouteRecordRaw[], router: any) {
             }
             //递归调用
             tmp.children = generateRoutes(tmp.children, router)
+        }
+
+        // 叶子路由必须有可用组件，否则跳过，避免导航时报错
+        if ((!tmp.children || tmp.children.length === 0) && !tmp.component) {
+            return
         }
         //动态添加路由
         router.addRoute(tmp)

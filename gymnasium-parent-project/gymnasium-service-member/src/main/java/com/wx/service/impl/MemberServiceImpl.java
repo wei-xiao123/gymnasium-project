@@ -1,17 +1,20 @@
 package com.wx.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wx.mapper.MemberApplyMapper;
 import com.wx.mapper.MemberCardMapper;
 import com.wx.mapper.MemberMapper;
 import com.wx.pojo.member.JoinParam;
 import com.wx.pojo.member.Member;
+import com.wx.pojo.member.PageParam;
 import com.wx.pojo.member.RechargeParam;
 import com.wx.pojo.member_apply.MemberApply;
 import com.wx.pojo.member_card.MemberCard;
 import com.wx.pojo.member_recharge.MemberRecharge;
-import com.wx.pojo.member_recharge.MemberRole;
+import com.wx.pojo.member_role.MemberRole;
 import com.wx.service.member.MemberService;
 import com.wx.service.member_recharge.MemberRechargeService;
 import com.wx.service.member_role.MemberRoleService;
@@ -29,6 +32,29 @@ import java.util.Date;
 
 @DubboService(interfaceClass = MemberService.class)
 public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> implements MemberService {
+
+    @Override
+    public IPage<Member> queryPage(PageParam param) {
+        long currentPage = param.getCurrentPage() == null ? 1L : param.getCurrentPage();
+        long pageSize = param.getPageSize() == null ? 10L : param.getPageSize();
+        IPage<Member> page = new Page<>(currentPage, pageSize);
+
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        if (StringUtils.isNotEmpty(param.getName())) {
+            query.like("name", param.getName());
+        }
+        if (StringUtils.isNotEmpty(param.getPhone())) {
+            query.like("phone", param.getPhone());
+        }
+        if (StringUtils.isNotEmpty(param.getUsername())) {
+            query.like("username", param.getUsername());
+        }
+        if ("1".equals(param.getUserType()) && StringUtils.isNotEmpty(param.getMemberId())) {
+            query.eq("member_id", param.getMemberId());
+        }
+        query.orderByDesc("join_time");
+        return this.baseMapper.selectPage(page, query);
+    }
 
     @DubboReference
     private MemberRoleService memberRoleService;

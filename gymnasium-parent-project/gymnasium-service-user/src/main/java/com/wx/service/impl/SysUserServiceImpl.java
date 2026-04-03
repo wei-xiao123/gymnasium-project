@@ -11,6 +11,8 @@ import com.wx.service.sys_user.SysUserService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 
+import java.util.List;
+
 @DubboService(interfaceClass = SysUserService.class)
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements SysUserService {
 
@@ -36,5 +38,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         QueryWrapper<SysUser> query = new QueryWrapper<>();
         query.lambda().eq(SysUser::getUsername,username);
         return this.baseMapper.selectOne(query);
+    }
+
+    @Override
+    public List<SysUser> getTeacherList() {
+        QueryWrapper<SysUser> query = new QueryWrapper<>();
+        query.eq("user_type", "2");
+        return this.baseMapper.selectList(query);
     }
 }

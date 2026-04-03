@@ -12,6 +12,6 @@ export type CardType = {
     cardType:string,
     cardId:string,
     price:string,
-    cardDay:number,
+    cardDay:number | "",
     status:string
 }

@@ -1,8 +1,10 @@
 import {type  MemberParam } from "@/api/member/MemberModel";
 import { reactive,ref,nextTick,onMounted } from "vue";
 import { getListApi} from '@/api/member'
+import { userStore } from '@/store/user'
 
 export default function useTable() {
+    const store = userStore()
 
     //定义表格的高度
     const tableHeight =  ref(0)
@@ -24,10 +26,19 @@ export default function useTable() {
     })
     //列表
     const getList = async ()=>{
-        let res = await getListApi(listParam)
-        if(res && res.code == 200){
-            tableList.list = res.data.records
-            listParam.total = res.data.total
+        // 补齐后端查询所需的用户上下文参数
+        listParam.userType = store.getUserType || ''
+        listParam.memberId = store.getUserId || ''
+
+        try {
+            let res = await getListApi(listParam)
+            if(res && res.code == 200){
+                tableList.list = res.data.records
+                listParam.total = res.data.total
+            }
+        } catch (error) {
+            tableList.list = []
+            listParam.total = 0
         }
     }
     //搜索

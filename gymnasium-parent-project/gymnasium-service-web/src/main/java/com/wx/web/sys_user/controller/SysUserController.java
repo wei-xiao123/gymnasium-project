@@ -1,6 +1,5 @@
 package com.wx.web.sys_user.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.wx.pojo.sys_role.SelectType;
 import com.wx.pojo.sys_user.PageParam;
@@ -37,10 +36,8 @@ public class SysUserController {
     //新增员工
     @PostMapping
     public ResultVo addUser(@RequestBody SysUser sysUser){
-        //判断用户名是否存在
-        QueryWrapper<SysUser> query = new QueryWrapper<>();
-        query.lambda().eq(SysUser::getUsername,sysUser.getUsername());
-        SysUser one = sysUserService.getOne(query);
+        //判断用户名是否存在，避免在web消费端跨Dubbo传输wrapper
+        SysUser one = sysUserService.loadUser(sysUser.getUsername());
         if(one != null){
             return ResultUtils.error("用户名已经存在!");
         }
@@ -62,11 +59,9 @@ public class SysUserController {
     //编辑员工
     @PutMapping
     public ResultVo editUser(@RequestBody SysUser sysUser){
-        //判断用户信息是否存在
-        QueryWrapper<SysUser> query = new QueryWrapper<>();
-        query.lambda().eq(SysUser::getUsername,sysUser.getUsername());
-        SysUser one = sysUserService.getOne(query);
-        if(one != null && one.getUserId() != sysUser.getUserId()){
+        //判断用户信息是否存在，避免在web消费端跨Dubbo传输wrapper
+        SysUser one = sysUserService.loadUser(sysUser.getUsername());
+        if(one != null && !one.getUserId().equals(sysUser.getUserId())){
             return ResultUtils.error("账户已经被占用");
         }
         //密码加密
@@ -106,18 +101,17 @@ public class SysUserController {
     //根据用户id查询角色id
     @GetMapping("/role")
     public ResultVo getRole(Long userId){
-        QueryWrapper<SysUserRole> query = new QueryWrapper<>();
-        query.lambda().eq(SysUserRole::getUserId,userId);
-        SysUserRole one = sysUserRoleService.getOne(query);
+        if(userId == null){
+            return ResultUtils.success("查询成功", null);
+        }
+        SysUserRole one = sysUserRoleService.getByUserId(userId);
         return ResultUtils.success("查询成功",one);
     }
 
     //查询课程教师
     @GetMapping("getTeacher")
     public ResultVo getTeacher(){
-        QueryWrapper<SysUser> query = new QueryWrapper<>();
-        query.lambda().eq(SysUser::getUserType,"2");
-        List<SysUser> list = sysUserService.list(query);
+        List<SysUser> list = sysUserService.getTeacherList();
         //组装数据
         List<SelectType> selectTypeList = new ArrayList<>();
         if(list.size() > 0){

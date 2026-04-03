@@ -23,10 +23,15 @@ export default function useMemberTable(){
 
     //查询列表
     const getList = async ()=>{
-        let res = await getListApi(listParam)
-        if(res && res.code == 200){
-         tableList.list = res.data.records
-         listParam.total = res.data.total
+        try {
+            let res = await getListApi(listParam)
+            if(res && res.code == 200){
+                tableList.list = res.data.records || []
+                listParam.total = res.data.total || 0
+            }
+        } catch (error) {
+            tableList.list = []
+            listParam.total = 0
         }
     }
 
@@ -54,7 +59,7 @@ export default function useMemberTable(){
 
     //刷新
     const refresh = ()=>{
-        getList
+        getList()
     }
 
     onMounted(()=>{

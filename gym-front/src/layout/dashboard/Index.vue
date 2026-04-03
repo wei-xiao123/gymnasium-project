@@ -227,9 +227,14 @@ const suggestList = ref<Suggest[]>([]);
 
 // 反馈列表
 const suggest = async () => {
-  const res = await getSuggestListApi();
-  if (res && res.code === 200) {
-    suggestList.value = res.data;
+  try {
+    const res = await getSuggestListApi();
+    if (res && res.code === 200) {
+      suggestList.value = res.data;
+    }
+  } catch (error) {
+    // 后端异常时保持页面可用，反馈列表降级为空
+    suggestList.value = [];
   }
 };
 

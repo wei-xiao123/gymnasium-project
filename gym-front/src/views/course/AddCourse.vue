@@ -105,7 +105,7 @@
             />
             <Editor
               style="height: 300px; overflow-y: hidden"
-              v-model="valueHtml"
+              v-model="addModel.courseDetails"
               :defaultConfig="editorConfig"
               :mode="mode"
               @onCreated="handleCreated"
@@ -156,7 +156,6 @@ const {
   handleCreated,
   mode,
   editorConfig,
-  valueHtml,
   toolbarConfig,
 } = useEditor();
 //显示弹框
@@ -189,8 +188,6 @@ const show = async (type: string, row?: CourseType) => {
     nextTick(() => {
       //把要编辑的数据复制到表单绑定的对象
       global.$objCopy(row, addModel);
-      //文本编辑器的回显
-      valueHtml.value = addModel.courseDetails;
       //图片回显
       if (row?.image) {
         //图片回显
@@ -203,10 +200,6 @@ const show = async (type: string, row?: CourseType) => {
         fileList.value.push(img);
       }
     });
-  }
-  if (row && row.courseDetails) {
-    //文本编辑器的回显
-    valueHtml.value = row.courseDetails;
   }
   onShow();
   //表单清空
@@ -225,20 +218,30 @@ const addModel = reactive<CourseType>({
   image: "",
   teacherName: "",
   teacherId: "",
-  courseHour: 0,
+  courseHour: "",
   courseDetails: "",
-  coursePrice: 0,
+  coursePrice: "",
 });
 const validateCourseHour = (rule: any, value: any, callback: any) => {
-  if (value === 0 || value < 0) {
+  if (value === "" || value === null || value === undefined) {
     callback(new Error("请填写课程课时"));
+    return;
+  }
+  const hour = Number(value);
+  if (Number.isNaN(hour) || hour <= 0) {
+    callback(new Error("课程课时必须大于0"));
   } else {
     callback();
   }
 };
 const validateCoursePrice = (rule: any, value: any, callback: any) => {
-  if (value === 0 || value < 0) {
+  if (value === "" || value === null || value === undefined) {
     callback(new Error("请填写课程价格"));
+    return;
+  }
+  const price = Number(value);
+  if (Number.isNaN(price) || price <= 0) {
+    callback(new Error("课程价格必须大于0"));
   } else {
     callback();
   }
@@ -294,8 +297,6 @@ const emits = defineEmits(["reFresh"]);
 const commit = () => {
   //封面图地址
   addModel.image = imgurl.value;
-  //课程详情
-  addModel.courseDetails = valueHtml.value;
   addFormRef.value?.validate(async (valid) => {
     if (valid) {
       let res: any;

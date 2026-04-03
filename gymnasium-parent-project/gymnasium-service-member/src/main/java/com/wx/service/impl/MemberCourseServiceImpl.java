@@ -1,11 +1,15 @@
 package com.wx.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wx.mapper.MemberCourseMapper;
 import com.wx.mapper.MemberMapper;
 import com.wx.pojo.course.Course;
+import com.wx.pojo.course.PageParam;
 import com.wx.pojo.member.RechargeParam;
 import com.wx.pojo.member_course.MemberCourse;
 import com.wx.service.course.CourseService;
@@ -37,5 +41,35 @@ public class MemberCourseServiceImpl extends ServiceImpl<MemberCourseMapper, Mem
             memberMapper.subMoney(param);
         }
 
+    }
+
+    @Override
+    public boolean existsByCourseAndMember(Long courseId, Long memberId) {
+        if (courseId == null || memberId == null) {
+            return false;
+        }
+        QueryWrapper<MemberCourse> query = new QueryWrapper<>();
+        query.eq("course_id", courseId).eq("member_id", memberId);
+        return this.baseMapper.selectCount(query) > 0;
+    }
+
+    @Override
+    public IPage<MemberCourse> queryPageByMember(PageParam param) {
+        long currentPage = param.getCurrentPage() == null ? 1L : param.getCurrentPage();
+        long pageSize = param.getPageSize() == null ? 10L : param.getPageSize();
+        IPage<MemberCourse> page = new Page<>(currentPage, pageSize);
+        QueryWrapper<MemberCourse> query = new QueryWrapper<>();
+        query.eq("member_id", param.getUserId());
+        return this.baseMapper.selectPage(page, query);
+    }
+
+    @Override
+    public IPage<MemberCourse> queryPageAll(PageParam param) {
+        long currentPage = param.getCurrentPage() == null ? 1L : param.getCurrentPage();
+        long pageSize = param.getPageSize() == null ? 10L : param.getPageSize();
+        IPage<MemberCourse> page = new Page<>(currentPage, pageSize);
+        QueryWrapper<MemberCourse> query = new QueryWrapper<>();
+        query.orderByDesc("member_course_id");
+        return this.baseMapper.selectPage(page, query);
     }
 }
