@@ -69,12 +69,13 @@ defineExpose({
 const addModel = reactive<MaterialType>({
   type: "",
   name: "",
-  numTotal: 0,
+  numTotal: "",
   details: "",
   id: "",
 });
 const validateNum = (rule: any, value: any, callback: any) => {
-  if (value === 0 || value < 0) {
+  const num = Number(value);
+  if (value === "" || value === null || value === undefined || Number.isNaN(num) || num <= 0) {
     callback(new Error("请填写数量"));
   } else {
     callback();

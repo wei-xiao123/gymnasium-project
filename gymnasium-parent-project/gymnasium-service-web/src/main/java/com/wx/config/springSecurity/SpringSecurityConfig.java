@@ -34,7 +34,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         //关闭跨域请求伪造过滤器
         http.csrf().disable().authorizeRequests()
                 //登录请求，回显验证码请求直接放行
-                .antMatchers("/api/login/login","/api/login/image").permitAll()
+            .antMatchers("/api/login/login","/api/login/image").permitAll()
                 // 其他的请求需要认证
                 .anyRequest().authenticated()
                 .and().exceptionHandling()

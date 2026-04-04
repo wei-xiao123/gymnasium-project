@@ -1,19 +1,18 @@
 package com.wx.web.lost.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.lost.Lost;
 import com.wx.pojo.lost.LostParam;
 import com.wx.service.lost.LostService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
-import org.apache.commons.lang.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/lost")
+@Slf4j
 public class LostController {
     @DubboReference
     private LostService lostService;
@@ -48,14 +47,8 @@ public class LostController {
     //列表查询
     @GetMapping("/list")
     public ResultVo list(LostParam param){
-        //构造分页对象
-        IPage<Lost> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-        //构造查询条件
-        QueryWrapper<Lost> query = new QueryWrapper<>();
-        if(StringUtils.isNotEmpty(param.getLostName())){
-            query.lambda().like(Lost::getLostName,param.getLostName());
-        }
-        IPage<Lost> list = lostService.page(page, query);
+        log.info("[lost-v2] list queryPage called, currentPage={}, pageSize={}, lostName={}", param.getCurrentPage(), param.getPageSize(), param.getLostName());
+        IPage<Lost> list = lostService.queryPage(param);
         return ResultUtils.success("查询成功", list);
     }
 }

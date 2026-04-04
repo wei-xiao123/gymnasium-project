@@ -24,7 +24,7 @@
         <template #default="scope">
           <el-image
             style="width: 60px; height: 60px; border-radius: 50%"
-            :src="scope.row.image"
+            :src="scope.row.imagePreview || scope.row.image"
           ></el-image>
         </template>
       </el-table-column>

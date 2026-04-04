@@ -5,8 +5,10 @@ import com.wx.jwt.JwtUtils;
 import com.wx.pojo.login.InfoParam;
 import com.wx.pojo.login.LoginParam;
 import com.wx.pojo.login.LoginResult;
+import com.wx.pojo.login.RegisterParam;
 import com.wx.pojo.login.UserInfo;
 import com.wx.pojo.member.Member;
+import com.wx.pojo.member.PageParam;
 import com.wx.pojo.sys_menu.MakeMenuTree;
 import com.wx.pojo.sys_menu.RouterVo;
 import com.wx.pojo.sys_menu.SysMenu;
@@ -33,6 +35,8 @@ import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -207,6 +211,60 @@ public class LoginController {
             return ResultUtils.error("用户类型错误");
         }
     }
+
+//    @PostMapping("/register")
+//    public ResultVo register(HttpServletRequest request, @RequestBody RegisterParam param) {
+//        try {
+//            if (param == null || StringUtils.isEmpty(param.getUsername()) || StringUtils.isEmpty(param.getPassword())
+//                    || StringUtils.isEmpty(param.getConfirmPassword()) || StringUtils.isEmpty(param.getPhone())
+//                    || StringUtils.isEmpty(param.getCode())) {
+//                return ResultUtils.error("用户名、密码、确认密码、手机号、验证码不能为空");
+//            }
+//            if (!param.getPassword().equals(param.getConfirmPassword())) {
+//                return ResultUtils.error("两次密码不一致");
+//            }
+//
+//            HttpSession session = request.getSession();
+//            String code = (String) session.getAttribute("code");
+//            if (StringUtils.isEmpty(code)) {
+//                return ResultUtils.error("验证码过期");
+//            }
+//            if (!code.equalsIgnoreCase(param.getCode())) {
+//                return ResultUtils.error("验证码错误");
+//            }
+//
+//            String username = param.getUsername().trim();
+//            String phone = param.getPhone().trim();
+//            if (memberService.loadUser(username) != null) {
+//                return ResultUtils.error("账号已存在");
+//            }
+//
+//            PageParam pageParam = new PageParam();
+//            pageParam.setCurrentPage(1L);
+//            pageParam.setPageSize(1L);
+//            pageParam.setPhone(phone);
+//            List<Member> phoneList = memberService.queryPage(pageParam).getRecords();
+//            if (phoneList != null && phoneList.stream().anyMatch(item -> phone.equals(item.getPhone()))) {
+//                return ResultUtils.error("手机号已被使用");
+//            }
+//
+//            Member member = new Member();
+//            member.setUsername(username);
+//            member.setPassword(passwordEncoder.encode(param.getPassword()));
+//            member.setPhone(phone);
+//            member.setName(StringUtils.isEmpty(param.getName()) ? username : param.getName().trim());
+//            member.setStatus("1");
+//            member.setJoinTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+//            member.setMoney(BigDecimal.ZERO);
+//            boolean saved = memberService.save(member);
+//            if (!saved) {
+//                return ResultUtils.error("注册失败，请稍后重试");
+//            }
+//            return ResultUtils.success("注册成功，请登录");
+//        } catch (Exception e) {
+//            return ResultUtils.error("注册失败: " + e.getMessage());
+//        }
+//    }
 
     @DubboReference
     SysMenuService sysMenuService;

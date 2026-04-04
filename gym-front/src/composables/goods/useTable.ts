@@ -1,6 +1,7 @@
 import { listApi } from "@/api/goods";
 import type { GoodsParam } from "@/api/goods/GoodsModel";
 import { reactive, ref, onMounted, nextTick } from "vue";
+import { getPrimaryImageUrl } from "@/utils/imageUrl";
 
 export default function useTable() {
   // 表格的高度
@@ -23,8 +24,12 @@ export default function useTable() {
   const getList = async () => {
     const res = await listApi(listParam);
     if (res && res.code === 200) {
-      tableData.list = res.data.records;
-      listParam.total = res.data.total;
+      const records = res.data?.records || res.data?.list || [];
+      tableData.list = records.map((item: any) => ({
+        ...item,
+        imagePreview: getPrimaryImageUrl(item.image),
+      }));
+      listParam.total = res.data?.total || records.length || 0;
     }
   };
 

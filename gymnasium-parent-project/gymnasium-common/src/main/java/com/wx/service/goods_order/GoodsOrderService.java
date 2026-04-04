@@ -18,4 +18,7 @@ public interface GoodsOrderService extends IService<GoodsOrder> {
     List<EchartItem> hotCards();
     //查询热销课程
     List<EchartItem> hotCourse();
+
+    //昨日订单数
+    int countYesterdayOrders();
 }

@@ -5,6 +5,7 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.SetBucketPolicyArgs;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,12 @@ public class MinioUtils {
         BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(bucketName).build();
         MakeBucketArgs makeBucketArgs = MakeBucketArgs.builder().bucket(bucketName).build();
         try {
-            if (client.bucketExists(bucketExistsArgs))
-                return;
-            client.makeBucket(makeBucketArgs);
+            if (!client.bucketExists(bucketExistsArgs)) {
+                client.makeBucket(makeBucketArgs);
+            }
+            // 允许匿名只读访问，确保前端img可直接显示对象
+            String policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::" + bucketName + "\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::" + bucketName + "/*\"]}]}";
+            client.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucketName).config(policy).build());
         } catch (Exception e) {
             log.error("创建桶失败：{}", e.getMessage());
             throw new RuntimeException(e);

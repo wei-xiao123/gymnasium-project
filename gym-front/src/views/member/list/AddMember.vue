@@ -96,6 +96,7 @@
                 class="m-2"
                 placeholder="请选择角色"
                 size="default"
+                :disabled="isMemberUser"
               >
                 <el-option
                   v-for="item in roleData.list"
@@ -110,7 +111,7 @@
         <el-row>
           <el-col :span="12" :offset="0">
             <el-form-item prop="status" label="状态">
-              <el-radio-group v-model="addModel.status">
+              <el-radio-group v-model="addModel.status" :disabled="isMemberUser">
                 <el-radio :label="'0'">停用</el-radio>
                 <el-radio :label="'1'">启用</el-radio>
               </el-radio-group>
@@ -118,7 +119,7 @@
           </el-col>
           <el-col :span="12" :offset="0">
             <el-form-item prop="username" label="会员卡号">
-              <el-input type="number" v-model="addModel.username"></el-input>
+              <el-input type="number" v-model="addModel.username" :disabled="isMemberUser" :readonly="isMemberUser"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
@@ -137,19 +138,22 @@
 <script setup lang="ts">
 import SysDialog from "@/components/SysDialog.vue";
 import useDialog from "@/hooks/useDialog";
-import { nextTick, reactive, ref } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
 import {type MemberType } from "@/api/member/MemberModel";
 import { ElMessage,type FormInstance } from "element-plus";
 import { addApi,editApi } from "@/api/member/index";
-import { EditType, Title,UserType } from "@/type/BaseEnum";
+import { EditType, Title } from "@/type/BaseEnum";
 import useInstance from "@/hooks/useInstance";
 import useSelectRole from "@/composables/user/useSelectRole";
+import { userStore } from "@/store/user";
 const { global } = useInstance();
 const addFormRef = ref<FormInstance>();
+const ustore = userStore();
 //角色
 const { roleData, listRole, roleMemberId, getMemberRole } = useSelectRole();
 //弹框属性
 const { dialog, onClose, onConfirm, onShow } = useDialog();
+const isMemberUser = computed(() => Number(ustore.getUserType) === 1);
 const getDefaultModel = (): MemberType => ({
   type: "",
   memberId: "",

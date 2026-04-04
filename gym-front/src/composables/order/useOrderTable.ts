@@ -1,7 +1,7 @@
 import { nextTick, onMounted, reactive, ref } from "vue"
 import type { OrderListParam } from "@/api/order/OrderModel"
 import { listApi } from "@/api/order"
-import { normalizeImageUrl } from "@/utils/imageUrl"
+import { getPrimaryImageUrl } from "@/utils/imageUrl"
 
 export default function useOrderTable() {
   // 表格高度
@@ -51,7 +51,7 @@ export default function useOrderTable() {
       const records = res.data?.records || res.data?.list || []
       tableData.list = records.map((item: any) => ({
         ...item,
-        image: normalizeImageUrl(item.image),
+        image: getPrimaryImageUrl(item.image),
       }))
       listParam.total = res.data?.total || 0
     }

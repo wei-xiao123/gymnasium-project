@@ -15,9 +15,8 @@ export default function useUpload() {
     const imgurl = ref('');
     //删除图片
     const handleRemove = (file: UploadFile) => {
-        console.log(file)
-        console.log(fileList.value)
         fileList.value = fileList.value.filter(item => item.name != file.name)
+        imgurl.value = ''
     }
     //点击预览图片
     const handlePictureCardPreview = (file: UploadFile) => {
@@ -41,12 +40,14 @@ export default function useUpload() {
         }
         const formData = new FormData();
         formData.append("file", file.raw);
-        let res = await uploadImageApi(formData);
-        if (res && res.code == 200 && res.data) {
-            console.log(res.data)
-            //imgurl.value = res.data;
-            imgurl.value = res.data.msg;
-            ElMessage.success("图片上传成功!");
+        try {
+            let res = await uploadImageApi(formData);
+            if (res && res.code == 200 && res.data) {
+                imgurl.value = res.data.msg || res.data.url || res.data.path || res.data;
+                ElMessage.success("图片上传成功!");
+            }
+        } catch (e) {
+            ElMessage.error("图片上传失败，请检查图片服务")
         }
     }
 

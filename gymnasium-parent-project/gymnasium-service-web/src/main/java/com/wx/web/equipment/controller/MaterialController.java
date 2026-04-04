@@ -1,14 +1,11 @@
 package com.wx.web.equipment.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.equipment.ListParam;
 import com.wx.pojo.equipment.Material;
 import com.wx.service.equipment.MaterialService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,14 +46,7 @@ public class MaterialController {
     //查询列表
     @GetMapping("/list")
     public ResultVo list(ListParam param){
-        //构造分页对象
-        IPage<Material> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-        //构造查询条件
-        QueryWrapper<Material> query = new QueryWrapper();
-        if(StringUtils.isNotEmpty(param.getName())){
-            query.lambda().like(Material::getName,param.getName());
-        }
-        IPage<Material> list = materialService.page(page, query);
+        IPage<Material> list = materialService.queryPage(param);
         return ResultUtils.success("查询成功", list);
     }
 }

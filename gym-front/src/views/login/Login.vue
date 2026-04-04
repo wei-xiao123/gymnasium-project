@@ -65,12 +65,17 @@
             :offset="0"
             style="padding-right: 0px; padding-left: 10px"
           >
-            <el-button size="large" style="width: 100%" type="danger" plain
+            <el-button size="large" style="width: 100%" type="danger" plain @click="onReset"
               >重置</el-button
             >
           </el-col>
         </el-row>
       </el-form-item>
+      <!--
+      <el-form-item>
+        <el-button link type="primary" @click="toRegister">没有账号？去注册</el-button>
+      </el-form-item>
+      -->
     </el-form>
   </div>
 </template>
@@ -81,16 +86,20 @@ import { reactive, ref } from "vue";
 import { loginApi } from "@/api/login/index";
 import {type FormInstance } from "element-plus";
 import { userStore } from "@/store/user";
+import { menuStore } from "@/store/menu";
+import { tabStore } from "@/store/tabs";
 import { useRouter } from "vue-router";
 const store = userStore();
+const mstore = menuStore();
+const tstore = tabStore();
 const router = useRouter();
 const loginRef = ref<FormInstance>();
 //验证码
 const { imgSrc, getImage } = useImage();
 //登录表单对象
 const loginModel = reactive({
-  username: "admin",
-  password: "123456",
+  username: "",
+  password: "",
   code: "",
   userType: "",
 });
@@ -129,18 +138,44 @@ const rules = reactive({
 const onSubmit = () => {
   loginRef.value?.validate(async (valid) => {
     if (valid) {
-      let res = await loginApi(loginModel);
-      if (res && res.code == 200) {
-        //存储userid和token
-        store.setToken(res.data.token);
-        store.setUserId(res.data.userId);
-        store.setUserType(res.data.userType)
-        //跳转到首页
-        router.push({ path: "/" });
+      try {
+        let res = await loginApi(loginModel);
+        if (res && res.code == 200) {
+          const newUserId = String(res.data.userId || "");
+          const newUserType = String(res.data.userType || "");
+          // 登录成功后清空历史菜单/标签缓存，避免不同账号看到上一个账号的导航记录
+          mstore.clearMenu();
+          tstore.clearTabs();
+          store.clearProfile();
+          sessionStorage.removeItem("tabsView");
+          //存储userid和token
+          store.setToken(res.data.token);
+          store.setUserId(newUserId);
+          store.setUserType(newUserType)
+          //跳转到首页
+          router.push({ path: "/" });
+        }
+      } catch (e) {
+        // 登录失败后刷新验证码并清空已输入验证码
+        loginModel.code = "";
+        await getImage();
       }
     }
   });
 };
+
+const onReset = async () => {
+  loginModel.username = "";
+  loginModel.password = "";
+  loginModel.code = "";
+  loginModel.userType = "";
+  loginRef.value?.clearValidate();
+  await getImage();
+};
+
+// const toRegister = () => {
+//   router.push({ path: "/register" });
+// };
 </script>
 
 <style scoped lang="scss">

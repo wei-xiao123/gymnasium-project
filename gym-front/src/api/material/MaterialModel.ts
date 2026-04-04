@@ -11,6 +11,6 @@ export type MaterialType = {
     id:string,
     name:string,
     details:string,
-    numTotal:number,
+    numTotal:number | "",
     type:string
 }

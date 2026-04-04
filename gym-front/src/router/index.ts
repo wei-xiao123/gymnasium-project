@@ -9,6 +9,11 @@ export const constantRoutes: Array<RouteRecordRaw> = [
     component: () => import("@/views/login/Login.vue"),
     name: "login",
   },
+  // {
+  //   path: "/register",
+  //   component: () => import("@/views/login/Register.vue"),
+  //   name: "register",
+  // },
   {
     path: "/",
     component: Layout,

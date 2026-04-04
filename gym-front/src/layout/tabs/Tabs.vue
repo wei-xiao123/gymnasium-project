@@ -17,11 +17,13 @@
   <script setup lang="ts">
   import { ref, computed, watch, onMounted } from "vue";
   import { tabStore } from "@/store/tabs";
+  import { menuStore } from "@/store/menu";
   import { useRoute, useRouter } from "vue-router";
   import {type Tab } from "@/store/tabs/index";
   const route = useRoute();
   const router = useRouter();
   const store = tabStore();
+  const mstore = menuStore();
   //获取tabs数据
   const tabsList = computed(() => {
     // return store.getters['getTabs']
@@ -67,6 +69,31 @@
     };
     store.addTab(tab);
   };
+
+  const collectPaths = (list: any[]): string[] => {
+    const result: string[] = [];
+    (list || []).forEach((item: any) => {
+      if (item && item.path) {
+        result.push(item.path);
+      }
+      if (item && item.children && item.children.length > 0) {
+        result.push(...collectPaths(item.children));
+      }
+    });
+    return result;
+  };
+
+  const sanitizeTabs = () => {
+    const allowSet = new Set(["/dashboard", ...collectPaths(mstore.getMenuList as any[])]);
+    const filtered = store.getTabs.filter((tab: Tab) => allowSet.has(tab.path));
+    if (filtered.length !== store.getTabs.length) {
+      store.tabList = filtered;
+      if (!allowSet.has(activeTab.value)) {
+        activeTab.value = "/dashboard";
+        router.push({ path: "/dashboard" });
+      }
+    }
+  };
   //监听路由的变化
   watch(
     () => route.path,
@@ -88,15 +115,26 @@
         let oldTabs = JSON.parse(tabSesson);
         if (oldTabs.length > 0) {
           store.tabList = oldTabs;
+          sanitizeTabs();
         }
       }
     }
   };
+
+  watch(
+    () => mstore.getMenuList,
+    () => {
+      sanitizeTabs();
+    },
+    { deep: true }
+  );
+
   onMounted(() => {
     //解决刷新选项卡数据丢失的问题
     beforeRefresh();
     //设置激活的选项卡
     setActiveTab();
+    sanitizeTabs();
     //把当前路由添加到选项卡数据
     addTab();
   });

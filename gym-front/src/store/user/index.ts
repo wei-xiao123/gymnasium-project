@@ -23,6 +23,10 @@ export const userStore = defineStore('userStore', {
         }
     },
     actions: {
+        clearProfile() {
+            this.codeList = []
+            this.name = ''
+        },
         setUserId(userId: string) {
             this.userId = userId
         },

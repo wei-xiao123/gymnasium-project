@@ -1,5 +1,5 @@
 import http from '@/http'
-import type {InfoParam, LoginParam} from './LoginModel'
+import type {InfoParam, LoginParam, RegisterParam} from './LoginModel'
 
 //获取验证码
 export const getImageApi = ()=>{
@@ -19,4 +19,9 @@ export const getMenuListApi = (param:InfoParam)=>{
 //查询用户信息
 export const getInfoApi = (param:InfoParam)=>{
     return http.get("/api/login/getInfo",param)
+}
+
+//注册
+export const registerApi = (param:RegisterParam)=>{
+    return http.post("/api/login/register",param)
 }

@@ -47,6 +47,9 @@ export const menuStore = defineStore('menuStore', {
         }
     },
     actions: {
+        clearMenu() {
+            this.menuList = []
+        },
         getMenu(router: any, parm: InfoParam) {
             return new Promise((resolve, reject) => {
                 getMenuListApi(parm).then((res) => {

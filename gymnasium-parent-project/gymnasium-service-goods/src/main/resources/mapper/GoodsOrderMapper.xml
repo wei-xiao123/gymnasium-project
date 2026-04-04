@@ -21,4 +21,10 @@
                LEFT JOIN `member_course` AS mc ON c.`course_id` = mc.`course_id`
               GROUP BY c.`course_id` ORDER BY `value` DESC LIMIT 3
     </select>
+
+    <select id="countYesterdayOrders" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM `goods_order`
+        WHERE DATE(`create_time`) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    </select>
 </mapper>

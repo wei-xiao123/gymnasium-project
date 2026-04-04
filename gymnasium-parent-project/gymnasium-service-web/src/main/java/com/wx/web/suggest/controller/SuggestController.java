@@ -1,14 +1,11 @@
 package com.wx.web.suggest.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wx.pojo.suggest.Suggest;
 import com.wx.pojo.suggest.SuggestParam;
 import com.wx.service.suggest.SuggestService;
 import com.wx.utils.ResultUtils;
 import com.wx.utils.ResultVo;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,15 +48,7 @@ public class SuggestController {
     //列表
     @GetMapping("/list")
     public ResultVo list(SuggestParam param){
-        //构造分页对象
-        IPage<Suggest> page = new Page<>(param.getCurrentPage(),param.getPageSize());
-        //构造查询条件
-        QueryWrapper<Suggest> query = new QueryWrapper<>();
-        if(StringUtils.isNotEmpty(param.getTitle())){
-            query.lambda().like(Suggest::getTitle,param.getTitle());
-        }
-        query.lambda().orderByDesc(Suggest::getDateTime);
-        IPage<Suggest> list = suggestService.page(page, query);
+        IPage<Suggest> list = suggestService.queryPage(param);
         return ResultUtils.success("查询成功", list);
     }
 

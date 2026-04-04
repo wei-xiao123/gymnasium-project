@@ -7,8 +7,8 @@ export type GoodsType = {
   details: string;
   unit: string;
   specs: string;
-  price: number;
-  store: number;
+  price: number | "";
+  store: number | "";
   num?: number;
 };
 

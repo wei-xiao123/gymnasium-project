@@ -22,12 +22,16 @@ public class ImageUploadController {
     @RequestMapping("/uploadImage")
     public ResultVo uploadImage(@RequestParam("file") MultipartFile file){
         log.info("触发上传图片controller");
-        JSONObject images=null;
+        JSONObject images = null;
         try {
             images = minioUtils.uploadFile(file, "gym"); //这里记得填你自己的bucket容器
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("上传图片失败", e);
+            return ResultUtils.error("图片上传失败，请检查 MinIO 服务是否启动");
         }
-        return ResultUtils.success("图片上传成功",images);
+        if (images == null || images.get("msg") == null) {
+            return ResultUtils.error("图片上传失败，请检查 MinIO 服务是否启动");
+        }
+        return ResultUtils.success("图片上传成功", images);
     }
 }

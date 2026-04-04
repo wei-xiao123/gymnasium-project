@@ -1,6 +1,5 @@
 package com.wx.web.home.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wx.pojo.home.Echart;
 import com.wx.pojo.home.EchartItem;
 import com.wx.pojo.home.ResetPassword;
@@ -57,7 +56,7 @@ public class HomeController {
         totalCount.setUserCount(userCount);
         int materCount = materialService.count();
         totalCount.setMaterCount(materCount);
-        int orderCount = goodsOrderService.count();
+        int orderCount = goodsOrderService.countYesterdayOrders();
         totalCount.setOrderCount(orderCount);
         return ResultUtils.success("查询成功",totalCount);
     }
@@ -66,9 +65,7 @@ public class HomeController {
     @GetMapping("/getSuggestList")
     public ResultVo getSuggestList(){
         try {
-            QueryWrapper<Suggest> query = new QueryWrapper<>();
-            query.lambda().orderByDesc(Suggest::getDateTime).last("limit 3");
-            List<Suggest> list = suggestService.list(query);
+            List<Suggest> list = suggestService.queryTopList(3);
             return ResultUtils.success("查询成功",list);
         } catch (Exception e) {
             log.error("查询反馈列表失败", e);

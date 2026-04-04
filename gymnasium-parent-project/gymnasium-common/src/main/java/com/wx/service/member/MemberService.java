@@ -23,4 +23,10 @@ public interface MemberService extends IService<Member> {
 
     //根据用户名查询会员
     Member loadUser(String username);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByPhone(String phone);
+
+    void registerMember(Member member);
 }

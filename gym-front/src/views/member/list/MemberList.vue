@@ -19,7 +19,7 @@
         <el-button type="danger" plain :icon="Close" @click="resetBtn"
           >重置</el-button
         >
-        <el-button :icon="Plus" type="primary" @click="addBtn">新增</el-button>
+        <el-button v-if="isStaff" :icon="Plus" type="primary" @click="addBtn">新增</el-button>
       </el-form-item>
     </el-form>
     <!-- 表格 -->
@@ -131,6 +131,11 @@ import useTable from "@/composables/member/useTable";
 import useMember from "@/composables/member/useMember";
 import useJoin from "@/composables/member/useJoin";
 import useRecharge from "@/composables/member/useRecharge";
+import { computed } from "vue";
+import { userStore } from "@/store/user";
+
+const ustore = userStore();
+const isStaff = computed(() => ustore.getUserType === "2");
 //表格相关
 const {
   listParam,

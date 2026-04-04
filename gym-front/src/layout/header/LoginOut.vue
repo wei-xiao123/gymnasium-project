@@ -63,6 +63,7 @@ const loginOut = async () => {
         store.setUserId("");
         store.setUserType("");
         localStorage.clear();
+      sessionStorage.removeItem("tabsView");
         window.location.href = "/login";
         }
   }
@@ -112,6 +113,7 @@ const commit = () => {
         store.setUserId("");
         store.setUserType("");
         localStorage.clear();
+        sessionStorage.removeItem("tabsView");
         window.location.href = "/login";
       }
     }

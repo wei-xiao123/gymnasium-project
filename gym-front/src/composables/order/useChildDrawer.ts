@@ -2,7 +2,7 @@ import { onMounted, reactive, ref } from "vue";
 import type { GoodsParam, GoodsType, AddCar } from "@/api/goods/GoodsModel";
 import { listApi } from "@/api/goods";
 import { ElMessage } from "element-plus";
-import { normalizeImageUrl } from "@/utils/imageUrl";
+import { getPrimaryImageUrl } from "@/utils/imageUrl";
 
 export default function useChildDrawer() {
   const innerDrawer = ref(false);
@@ -34,7 +34,7 @@ export default function useChildDrawer() {
       const records = res.data?.records || res.data?.list || [];
       tableList.list = records.map((item: any) => ({
         ...item,
-        image: normalizeImageUrl(item.image),
+        image: getPrimaryImageUrl(item.image),
       }));
       goodsParam.total = res.data?.total || 0;
     }

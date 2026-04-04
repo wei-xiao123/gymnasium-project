@@ -43,4 +43,15 @@ public class GoodsOrderServiceImpl extends ServiceImpl<GoodsOrderMapper, GoodsOr
     public List<EchartItem> hotCourse() {
         return this.baseMapper.hotCourse();
     }
+
+    @Override
+    public int countYesterdayOrders() {
+        try {
+            Integer count = this.baseMapper.countYesterdayOrders();
+            return count == null ? 0 : count;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
 }

@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +52,24 @@ public class MemberController {
     //修改会员
     @PutMapping
     public ResultVo edit(@RequestBody Member member){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof Member) {
+            Member loginMember = (Member) authentication.getPrincipal();
+            if (loginMember.getMemberId() == null || member.getMemberId() == null
+                    || !loginMember.getMemberId().equals(member.getMemberId())) {
+                return ResultUtils.error("只能修改自己的信息");
+            }
+            Member dbMember = memberService.getById(member.getMemberId());
+            if (dbMember == null) {
+                return ResultUtils.error("会员不存在");
+            }
+            member.setUsername(dbMember.getUsername());
+            member.setStatus(dbMember.getStatus());
+            MemberRole dbRole = memberRoleService.getByMemberId(member.getMemberId());
+            if (dbRole != null) {
+                member.setRoleId(dbRole.getRoleId());
+            }
+        }
         Member one = memberService.loadUser(member.getUsername());
         if(one != null && !one.getMemberId().equals(member.getMemberId())){
             return ResultUtils.error("会员卡号被占用!");

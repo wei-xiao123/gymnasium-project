@@ -173,4 +173,31 @@ public class MemberServiceImpl extends ServiceImpl<MemberMapper, Member> impleme
         query.lambda().eq(Member::getUsername,username);
         return this.baseMapper.selectOne(query);
     }
+
+    @Override
+    public boolean existsByUsername(String username) {
+        if (StringUtils.isEmpty(username)) {
+            return false;
+        }
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        query.lambda().eq(Member::getUsername, username);
+        Integer count = this.baseMapper.selectCount(query);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean existsByPhone(String phone) {
+        if (StringUtils.isEmpty(phone)) {
+            return false;
+        }
+        QueryWrapper<Member> query = new QueryWrapper<>();
+        query.lambda().eq(Member::getPhone, phone);
+        Integer count = this.baseMapper.selectCount(query);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public void registerMember(Member member) {
+        this.baseMapper.insert(member);
+    }
 }
